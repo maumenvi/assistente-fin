@@ -35,6 +35,17 @@ O usuário é dono dos dados: tudo roda sobre um PostgreSQL próprio, sem servid
 O app roda sincronizado com o desktop (mesmos saldos, limites e lançamentos) e funciona offline.
 Vídeo do tour: [android-tour.mp4](docs/media/android-tour.mp4).
 
+### Servidor MCP (assistente de IA operando o app)
+
+![Sessão MCP](docs/media/mcp-assistente.gif)
+
+Sessão real contra o servidor MCP embutido no desktop (63 ferramentas, HTTP local, autenticado por chave),
+rodando sobre um banco de teste descartável: o assistente consulta os limites, lança um gasto e simula uma compra.
+As perguntas são ilustrativas; as chamadas e as respostas são as do servidor. O lançamento criado pelo MCP
+aparece na hora no extrato do desktop:
+
+![Extrato com o lançamento criado via MCP](docs/media/desktop-extrato-mcp.png)
+
 ## O que o produto faz
 
 - **Desktop**: contas, ganhos, gastos fixos, cartões com compras parceladas, limites de gasto,
