@@ -169,4 +169,9 @@ Model Context Protocol (SDK oficial) · Fastify · Playwright · electron-builde
 
 ## Contato
 
-**Marco Aurélio Tôrres Vieira** — aberto a conversar sobre o produto, licenciamento ou oportunidades.
+**Marco Aurélio Tôrres Vieira** — Senior Backend Engineer (Node.js/TypeScript, IA aplicada: MCP e agentes) · Belo Horizonte, MG
+
+- GitHub: [github.com/maumenvi](https://github.com/maumenvi)
+- LinkedIn: [Marco Aurélio Tôrres Vieira](https://www.linkedin.com/in/marco-aurélio-tôrres-vieira-294524b8)
+
+Aberto a conversar sobre o produto, licenciamento ou oportunidades.
