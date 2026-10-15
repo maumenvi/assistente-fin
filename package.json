@@ -1,7 +1,7 @@
 {
   "name": "assistente-fin",
   "license": "SEE LICENSE IN LICENSE",
-  "version": "1.0.16",
+  "version": "1.0.18",
   "description": "Aplicativo de controle financeiro pessoal para desktop e celular.",
   "scripts": {
     "test": "node --test --test-concurrency=1",
