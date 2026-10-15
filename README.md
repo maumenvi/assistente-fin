@@ -20,7 +20,20 @@ O usuário é dono dos dados: tudo roda sobre um PostgreSQL próprio, sem servid
 | **Cartão de crédito** | **Projeções** |
 | ![Cartão](docs/media/desktop-cartao.png) | ![Projeções](docs/media/desktop-projecoes.png) |
 
-<!-- TODO: android-*.png/gif e mcp-assistente.gif quando houver captura no aparelho -->
+### App Android
+
+<p align="center">
+  <img src="docs/media/android-tour.gif" alt="Tour pelo app Android" width="260">
+  &nbsp;
+  <img src="docs/media/android-lancamento.gif" alt="Lançando um gasto" width="260">
+</p>
+
+| Início | Limites | Extrato | Simular compra | Mais |
+|---|---|---|---|---|
+| <img src="docs/media/android-inicio.png" width="160"> | <img src="docs/media/android-inicio-limites.png" width="160"> | <img src="docs/media/android-extrato.png" width="160"> | <img src="docs/media/android-simular.png" width="160"> | <img src="docs/media/android-mais.png" width="160"> |
+
+O app roda sincronizado com o desktop (mesmos saldos, limites e lançamentos) e funciona offline.
+Vídeo do tour: [android-tour.mp4](docs/media/android-tour.mp4).
 
 ## O que o produto faz
 
