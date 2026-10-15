@@ -10,14 +10,17 @@ O usuário é dono dos dados: tudo roda sobre um PostgreSQL próprio, sem servid
 
 ## Em funcionamento
 
-| Desktop | Android |
-|---|---|
-| ![Dashboard](docs/media/desktop-dashboard.png) | ![Início](docs/media/android-inicio.png) |
-| ![Extrato](docs/media/desktop-extrato.png) | ![Lançamento rápido](docs/media/android-lancamento.gif) |
+![Tour pelo desktop](docs/media/desktop-tour.gif)
 
-- Lançar no celular e ver no desktop (sync): `docs/media/sync-android-desktop.gif`
-- Assistente de IA lançando e consultando via MCP: `docs/media/mcp-assistente.gif`
-- Previsão mensal e cenários: `docs/media/desktop-cenarios.gif`
+| Dashboard | Extrato |
+|---|---|
+| ![Dashboard](docs/media/desktop-dashboard.png) | ![Extrato](docs/media/desktop-extrato.png) |
+| **Limites de gasto** | **Gastos fixos** |
+| ![Limites](docs/media/desktop-limites.png) | ![Gastos fixos](docs/media/desktop-gastos-fixos.png) |
+| **Cartão de crédito** | **Projeções** |
+| ![Cartão](docs/media/desktop-cartao.png) | ![Projeções](docs/media/desktop-projecoes.png) |
+
+<!-- TODO: android-*.png/gif e mcp-assistente.gif quando houver captura no aparelho -->
 
 ## O que o produto faz
 
