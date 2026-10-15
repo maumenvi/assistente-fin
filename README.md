@@ -1,6 +1,6 @@
-# Finance Controller
+# Assistente Fin
 
-Controle financeiro pessoal **local-first**: um app **desktop (Electron)**, um **app Android** que
+**Assistente Fin** é um assistente financeiro pessoal **local-first**: um app **desktop (Electron)**, um **app Android** que
 sincroniza com o desktop e um **servidor MCP** para assistentes de IA operarem os dados.
 O usuário é dono dos dados: tudo roda sobre um PostgreSQL próprio, sem servidor de aplicação.
 
