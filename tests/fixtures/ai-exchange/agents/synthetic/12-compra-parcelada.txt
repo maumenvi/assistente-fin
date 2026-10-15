@@ -1,0 +1,21 @@
+```json
+FINCTRL-IMPORT v1
+{
+  "batchId": "sint-0003",
+  "ops": [
+    {
+      "ref": "p",
+      "kind": "create",
+      "entity": "installmentPurchase",
+      "data": {
+        "accountId": "acc-iti",
+        "amountCents": 120000,
+        "installments": 6,
+        "date": "2026-10-14",
+        "categoryId": "cat-mercado",
+        "notes": "Geladeira"
+      }
+    }
+  ]
+}
+```

@@ -1,0 +1,45 @@
+.env
+.env.*
+!.env.example
+
+node_modules/
+dist/
+out/
+coverage/
+.turbo/
+test-results/
+playwright-report/
+
+# client Prisma gerado (generator prisma-client) - reconstruido por `npm run db:generate`
+src/database/prisma/generated/
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+.DS_Store
+Thumbs.db
+
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+*.local
+*.log
+
+# Servidor MCP (feature 004)
+mcp-backups/
+
+# Canvas de design seedado (payload ~2MB do editor) - fonte fica em .dc.html/canvas.json
+.design/configuracao-mcp.html
+
+# App Android (spec 022) - android/ e gerado pelo `expo prebuild` (CNG)
+src/react-native/android/
+src/react-native/node_modules/
+src/react-native/.expo/
+dist/apk/*.apk
+# build nativo dos modulos locais do app Android
+src/react-native/modules/*/android/build/

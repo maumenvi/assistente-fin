@@ -1,0 +1,18 @@
+Comprovante de transferência
+Pix enviado
+Valor
+R$ 150,00
+Data e hora
+25/09/2026 - 10:15:22
+Destino
+Nome
+Maria da Silva Souza
+CPF
+***.456.789-**
+Instituição
+NU PAGAMENTOS - IP
+Origem
+Nome
+Marco Aurelio
+ID da transação
+E12345678202609251015abcdef

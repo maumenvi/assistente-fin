@@ -1,0 +1,24 @@
+```json
+FINCTRL-IMPORT v1
+{
+  "batchId": "sint-0002",
+  "snapshotId": "s-1",
+  "ops": [
+    {
+      "kind": "update",
+      "entity": "transaction",
+      "id": "tx_1",
+      "expectV": "2026-10-10T12:00:00.000Z",
+      "data": {
+        "categoryId": "cat-lazer"
+      }
+    },
+    {
+      "kind": "delete",
+      "entity": "fixedExpense",
+      "id": "fe_1",
+      "confirm": true
+    }
+  ]
+}
+```

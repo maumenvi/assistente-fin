@@ -1,0 +1,20 @@
+FINCTRL-IMPORT v1
+{
+  “batchId”: “sint-0001”,
+  "snapshotId": "s-1",
+  "ops": [
+    {
+      "ref": "a",
+      "kind": "create",
+      "entity": "transaction",
+      "data": {
+        "date": "2026-10-13",
+        "amountCents": 2350,
+        "type": "expense",
+        "accountId": "acc-itau",
+        "categoryId": "cat-mercado",
+        "notes": "Padaria"
+      }
+    }
+  ]
+}

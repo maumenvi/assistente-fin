@@ -1,0 +1,18 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Arte-fonte unica do icone (spec 026) - todas as variantes sao derivadas por `npm run icons`.
+       `#bg` e o fundo; `#glyph` sao as barras + a linha de tendencia. -->
+  <g id="bg">
+    <rect width="1024" height="1024" rx="224" fill="#1a1a19"/>
+    <rect width="1024" height="1024" rx="224" fill="none" stroke="#2e2e2c" stroke-width="8"/>
+  </g>
+
+  <g id="glyph">
+    <rect x="228" y="596" width="128" height="212" rx="24" fill="#4f9d76"/>
+    <rect x="448" y="468" width="128" height="340" rx="24" fill="#4f9d76"/>
+    <rect x="668" y="316" width="128" height="492" rx="24" fill="#6fc79a"/>
+    <path d="M232 452 L472 344 L620 392 L812 220"
+          fill="none" stroke="#e8e8e6" stroke-width="34"
+          stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="812" cy="220" r="40" fill="#e8e8e6"/>
+  </g>
+</svg>

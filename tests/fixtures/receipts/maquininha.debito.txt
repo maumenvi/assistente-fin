@@ -1,0 +1,7 @@
+stone
+Comprovante de venda - Via do cliente
+MERCADINHO BOM PRECO
+MASTERCARD DEBITO
+**** **** **** 1234
+Data: 03/09/26 Hora: 09:05:11
+TOTAL: R$1.234,56

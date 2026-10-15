@@ -1,0 +1,670 @@
+// Schema Prisma (spec 001, RF-20..RF-22). Detalhe do adaptador `database/prisma/` - o
+// dominio e os casos de uso nao importam nada gerado a partir daqui (rule 10).
+// Mapeamento de conceitos de dominio -> coluna: ver specs/001-app-financeiro-pessoal/plan.md.
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/database/prisma/generated"
+  moduleFormat = "esm"
+}
+
+// A URL de conexao para Migrate/introspection vem de `prisma.config.ts` (Prisma 7); em
+// runtime o `PrismaDatabase` passa um driver adapter (@prisma/adapter-pg) ao PrismaClient.
+datasource db {
+  provider = "postgresql"
+}
+
+/// Natureza da conta (domain/account/account.kind.ts, ACCOUNT_KINDS).
+enum AccountKind {
+  checking
+  savings
+  wallet
+  credit_card @map("credit-card")
+  meal_voucher @map("meal-voucher")
+  other
+}
+
+/// Usuario vinculado a CPF, e-mail e telefone (RF-15, RF-16, RF-23). `id` e `createdAt` sem
+/// @default: quem gera e o caso de uso (IdGenerator / data injetada), nao o banco - mesma
+/// filosofia do Account. `*VerifiedAt` nulo = canal ainda nao verificado (RF-26, RF-28).
+model User {
+  id              String    @id
+  cpf             String    @unique
+  email           String    @unique
+  phone           String    @unique
+  name            String
+  createdAt       DateTime  @map("created_at")
+  emailVerifiedAt DateTime? @map("email_verified_at")
+  phoneVerifiedAt DateTime? @map("phone_verified_at")
+  passwordHash    String?   @map("password_hash")
+  recoveryKeyHash String?   @map("recovery_key_hash")
+  telegramChatId  String?   @map("telegram_chat_id")
+  /// Conta padrao para pre-selecao no cadastro de lancamentos (spec 007, RF-3). Nula = sem
+  /// preferencia definida (comportamento atual). `ON DELETE SET NULL`: excluir a conta limpa
+  /// a preferencia automaticamente.
+  defaultAccountId String?   @map("default_account_id")
+  /// Limite de saldo baixo do Dashboard, em centavos (spec 015, RF-2). Nulo = usuario nunca
+  /// configurou, resolve para R$ 400,00 (40000 centavos) na leitura.
+  lowBalanceThresholdCents Int? @map("low_balance_threshold_cents")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  defaultAccount    Account?  @relation("UserDefaultAccount", fields: [defaultAccountId], references: [id], onDelete: SetNull)
+  accounts          Account[] @relation("UserAccounts")
+  verificationCodes VerificationCode[]
+  incomes           Income[]
+  fixedExpenses     FixedExpense[]
+  spendingLimits    SpendingLimit[]
+  spendingLimitPlans SpendingLimitPlan[]
+  transactions      Transaction[]
+  transactionSeries TransactionSeries[]
+  purchaseSimulations PurchaseSimulation[]
+  projectionScenarios ProjectionScenario[]
+  scenarioApplication ScenarioApplication?
+  dataSnapshots       DataSnapshot[]
+  categories          Category[]
+  mcpAccessKeys       McpAccessKey[]
+  preRegistrations    PreRegistration[]
+  captureAttachments  CaptureAttachment[]
+  pairedDevices       PairedDevice[]
+  balanceGenerations  BalanceGeneration[]
+  userNotifications   UserNotification[]
+  captureReceipts     CaptureReceipt[]
+  preRegistrationOutcomes PreRegistrationOutcome[]
+
+  @@map("users")
+}
+
+/// Conta financeira (RF-1). `id` nao tem @default: quem gera e o IdGenerator do dominio.
+model Account {
+  id             String      @id
+  userId         String      @map("user_id")
+  user           User        @relation("UserAccounts", fields: [userId], references: [id])
+  name           String
+  kind           AccountKind
+  openingBalance Int         @map("opening_balance_cents")
+  /// Data em que openingBalance foi observado/apurado. Null em contas legadas criadas antes
+  /// deste campo existir - so o calculo de saldo da conta usa isso como piso de data.
+  openingBalanceDate DateTime? @map("opening_balance_date")
+  currency       String      @default("BRL")
+  archived       Boolean     @default(false)
+  updatedAt      DateTime    @updatedAt @map("updated_at")
+  /// Limite de credito (spec 008, RF-1). So se aplica a kind: credit-card; null nos demais.
+  creditLimitCents Int?      @map("credit_limit_cents")
+  /// Dia do mes de fechamento da fatura (spec 008 revisao, RF-2), independente do vencimento.
+  /// So se aplica a kind: credit-card.
+  closingDay       Int?      @map("closing_day")
+  /// Dia do mes de vencimento da fatura (spec 008, RF-2). So se aplica a kind: credit-card.
+  dueDay           Int?      @map("due_day")
+  /// Marca a conta como "beneficio" (spec 011, RF-9): ganhos/gastos dela nao entram nos
+  /// totais gerais, exibidos separadamente. Por conta, independente do kind.
+  isBenefit        Boolean   @default(false) @map("is_benefit")
+
+  defaultForUsers User[] @relation("UserDefaultAccount")
+
+  fixedExpenses FixedExpense[]
+  transactions  Transaction[]
+  transactionSeries TransactionSeries[]
+  purchaseSimulations PurchaseSimulation[]
+  /// Ganhos vinculados a esta conta (spec 012, RF-1). Sem relacao inversa nomeada especifica -
+  /// segue o mesmo padrao de `transactions`/`transactionSeries` acima.
+  incomes Income[]
+
+  @@index([userId])
+  @@map("accounts")
+}
+
+/// Controle de geracao do lancamento automatico de saldo do mes anterior (spec 011, RF-16,
+/// decisao 4.9). Marca que a geracao ja foi oferecida naquele mes, mesmo que o usuario tenha
+/// excluido o lancamento depois (RF-17) - so a ausencia do marcador dispara uma nova geracao.
+model BalanceGeneration {
+  id     String @id
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id])
+  year   Int
+  month  Int
+
+  @@unique([userId, year, month])
+  @@index([userId])
+  @@map("balance_generations")
+}
+
+/// Canal de verificacao (domain/verification/verification.channel.ts, VERIFICATION_CHANNELS).
+/// Sem hifen nos valores, entao sem @map - o nome do membro ja bate com o valor do dominio.
+enum VerificationChannel {
+  email
+  phone
+}
+
+/// Codigo de verificacao de e-mail/telefone (RF-24..RF-27). Tabela propria (nao embutida em
+/// User): guarda historico, cada RequestVerification cria uma linha nova. `id`/`createdAt`
+/// sem @default - mesma filosofia das outras entidades.
+model VerificationCode {
+  id          String              @id
+  userId      String              @map("user_id")
+  user        User                @relation(fields: [userId], references: [id])
+  channel     VerificationChannel
+  code        String
+  expiresAt   DateTime            @map("expires_at")
+  createdAt   DateTime            @map("created_at")
+  confirmedAt DateTime?           @map("confirmed_at")
+
+  @@index([userId, channel])
+  @@map("verification_codes")
+}
+
+/// Frequencia de recorrencia (domain/shared/recurrence.frequency.ts, RECURRENCE_FREQUENCIES).
+/// `nao-repete` tem hifen -> @map; as demais batem com o valor do dominio.
+enum RecurrenceFrequency {
+  naoRepete  @map("nao-repete")
+  diaria
+  semanal
+  mensal
+  trimestral
+  semestral
+  anual
+}
+
+/// Ganho detalhado (RF-2). `id` sem @default - mesma filosofia das outras entidades.
+model Income {
+  id                 String         @id
+  userId             String         @map("user_id")
+  user               User           @relation(fields: [userId], references: [id])
+  date               DateTime
+  amountCents        Int            @map("amount_cents")
+  currency           String         @default("BRL")
+  source              String
+  recurrenceFrequency RecurrenceFrequency @map("recurrence_frequency")
+  recurrenceEveryN    Int                 @map("recurrence_every_n")
+  recurrenceEndDate   DateTime?           @map("recurrence_end_date")
+  categoryId          String              @map("category_id")
+  category            Category            @relation(fields: [categoryId], references: [id])
+  notes               String?
+  /// Conta vinculada (spec 012, RF-1). Nula = ganho sem conta (simulacao de cenario ou
+  /// registro legado anterior a esta spec) - nao gera `TransactionSeries`, nao aparece no
+  /// Extrato/Dashboard (RF-4).
+  accountId           String?             @map("account_id")
+  account             Account?            @relation(fields: [accountId], references: [id])
+  updatedAt           DateTime            @updatedAt @map("updated_at")
+
+  /// Transacoes lancadas a partir deste ganho (spec 012, RF-3/RF-5) - 1:N, uma por mes.
+  launchedTransactions Transaction[]
+
+  @@index([userId])
+  @@index([categoryId])
+  @@index([accountId])
+  @@map("incomes")
+}
+
+/// Gasto fixo recorrente (RF-3). `id` sem @default; `paid` comeca false em `create()`, quem
+/// muda e `markAsPaid`/`markAsUnpaid` do dominio (mesma filosofia de `Account.archived`).
+model FixedExpense {
+  id                  String         @id
+  userId              String         @map("user_id")
+  user                User           @relation(fields: [userId], references: [id])
+  dueDay              Int            @map("due_day")
+  // Mes de referencia (1-12) e descricao, ambos opcionais e informativos (spec 006, RF-1/
+  // RF-4) - nao alteram a projecao mensal (RF-2, ver monthly.forecast.ts).
+  referenceMonth      Int?     @map("reference_month")
+  description         String?
+  expectedAmountCents Int      @map("expected_amount_cents")
+  currency            String   @default("BRL")
+  categoryId          String   @map("category_id")
+  category            Category @relation(fields: [categoryId], references: [id])
+  accountId           String   @map("account_id")
+  account             Account  @relation(fields: [accountId], references: [id])
+  paid                Boolean  @default(false)
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  /// Transacoes geradas ao marcar este gasto fixo como pago (spec 015) - ver `Transaction.fixedExpenseId`.
+  transactions        Transaction[]
+
+  @@index([userId])
+  @@index([categoryId])
+  @@map("fixed_expenses")
+}
+
+/// Limite de gasto nao fixo por categoria e periodo (RF-4). `id` sem @default. Status
+/// (ok|at-risk|exceeded) e calculado em runtime (domain/spending-limit/limit.status.ts),
+/// nao gravado - depende do quanto foi gasto, que muda a cada transacao.
+model SpendingLimit {
+  id             String @id
+  userId         String @map("user_id")
+  user           User     @relation(fields: [userId], references: [id])
+  categoryId     String   @map("category_id")
+  category       Category @relation(fields: [categoryId], references: [id])
+  periodYear     Int      @map("period_year")
+  periodMonth    Int      @map("period_month")
+  maxAmountCents Int      @map("max_amount_cents")
+  currency       String   @default("BRL")
+  /// Plano de origem que gerou este limite ao "aplicar" este mes (spec 016). Nulo = limite
+  /// criado manualmente direto num mes (caminho antigo, preservado) OU plano de origem ja
+  /// excluido - `SET NULL` (nao `NoAction`/RESTRICT): excluir o plano nao pode ficar
+  /// bloqueado pelos limites ja aplicados, entao a FK desvincula em vez de impedir.
+  definitionId   String?  @map("definition_id")
+  definition     SpendingLimitPlan? @relation(fields: [definitionId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([categoryId])
+  @@index([definitionId])
+  @@map("spending_limits")
+}
+
+/// Definicao recorrente de um limite de gasto (categoria + valor maximo + recorrencia), sem
+/// mes fixo - equivalente a `Income` para `SpendingLimit` (spec 016). `id` sem @default.
+model SpendingLimitPlan {
+  id                  String              @id
+  userId              String              @map("user_id")
+  user                User                @relation(fields: [userId], references: [id])
+  categoryId          String              @map("category_id")
+  category            Category            @relation(fields: [categoryId], references: [id])
+  maxAmountCents      Int                 @map("max_amount_cents")
+  currency            String              @default("BRL")
+  recurrenceFrequency RecurrenceFrequency @map("recurrence_frequency")
+  recurrenceEveryN    Int                 @map("recurrence_every_n")
+  recurrenceEndDate   DateTime?           @map("recurrence_end_date")
+  /// Ancora para o teto de alcance da recorrencia (spec 003, RF-18) - papel equivalente a
+  /// `Income.date`, congelada na criacao (nunca reeditada).
+  createdAt           DateTime            @map("created_at")
+  updatedAt           DateTime            @updatedAt @map("updated_at")
+
+  /// Limites ja aplicados a partir deste plano (spec 016) - 1:N, um por mes aplicado.
+  appliedLimits SpendingLimit[]
+
+  @@index([userId])
+  @@index([categoryId])
+  @@map("spending_limit_plans")
+}
+
+/// Natureza da transacao (domain/transaction/transaction.type.ts, TRANSACTION_TYPES). Sem
+/// hifen nos valores, entao sem @map.
+enum TransactionType {
+  income
+  expense
+}
+
+/// Transacao manual (RF-5, RF-6). `id` sem @default. Toda transacao tem categoria (spec 003,
+/// RF-10): "pendente de classificacao" = apontar para a categoria padrao do usuario.
+/// Indice composto pra `findDuplicate` (CA-5) nao varrer a tabela.
+model Transaction {
+  id          String          @id
+  userId      String          @map("user_id")
+  user        User            @relation(fields: [userId], references: [id])
+  date        DateTime
+  amountCents Int             @map("amount_cents")
+  currency    String          @default("BRL")
+  type        TransactionType
+  categoryId  String          @map("category_id")
+  category    Category        @relation(fields: [categoryId], references: [id])
+  series      TransactionSeries? @relation(fields: [seriesId], references: [id])
+  accountId   String          @map("account_id")
+  account     Account         @relation(fields: [accountId], references: [id])
+  notes       String?
+  // Recorrencia da transacao manual (spec 003, RF-16). Nulo = lancamento nao recorrente;
+  // a entidade materializa as ocorrencias (spec 003, RF-25), agrupadas por `series_id`.
+  recurrenceFrequency RecurrenceFrequency? @map("recurrence_frequency")
+  recurrenceEveryN    Int?                 @map("recurrence_every_n")
+  recurrenceEndDate   DateTime?            @map("recurrence_end_date")
+  seriesId            String?              @map("series_id")
+  // Vinculo de parcelas de compra parcelada no cartao de credito (spec 009, RF-4). Os tres
+  // campos sao nulos juntos (lancamento comum) ou preenchidos juntos (parcela); number/total
+  // sao 1-based (ex.: 3 de 12).
+  installmentGroupId  String?              @map("installment_group_id")
+  installmentNumber   Int?                 @map("installment_number")
+  installmentTotal    Int?                 @map("installment_total")
+  /// Vinculo com o `Income` de origem (spec 012, RF-3/RF-5, Q2). 1:N - varios `Transaction`
+  /// (um por mes lancado) podem apontar para o mesmo `Income`; nula para toda transacao que
+  /// nao veio de um lancamento de `Income` (a maioria). Sem `onDelete: Cascade`: excluir o
+  /// `Income` NAO apaga o historico ja lancado (RF-9) - a FK fica "orfa" (aponta para um id
+  /// que nao existe mais); o DTO/UI do Extrato nunca depende desse campo.
+  incomeId            String?              @map("income_id")
+  income              Income?              @relation(fields: [incomeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  /// Vinculo com o `FixedExpense` de origem (spec 015). 1:1 (nao 1:N como `incomeId`):
+  /// `FixedExpense.paid` e uma flag unica sem nocao de mes, entao so existe no maximo uma
+  /// `Transaction` "ativa" por gasto fixo - `SetFixedExpensePaidUseCase` cria ao marcar pago e
+  /// remove ao desmarcar. Sem `onDelete: Cascade`, mesmo criterio de `incomeId`: excluir o
+  /// `FixedExpense` nao apaga o historico ja lancado no Extrato.
+  fixedExpenseId      String?              @map("fixed_expense_id")
+  fixedExpense        FixedExpense?        @relation(fields: [fixedExpenseId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  /// Id do par de transferencia (spec 016, RF-5). As duas pontas de uma transferencia
+  /// compartilham o mesmo valor - agrupador logico, sem relacao FK (mesma decisao de
+  /// `installmentGroupId`).
+  transferGroupId     String?              @map("transfer_group_id")
+  /// Id do par de pagamento de fatura de cartao (spec 016, RF-6). Mesma mecanica de
+  /// `transferGroupId`, nunca a mesma operacao/categoria.
+  cardPaymentGroupId  String?              @map("card_payment_group_id")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([categoryId])
+  @@index([userId, accountId, type, amountCents, date])
+  @@index([seriesId])
+  @@index([installmentGroupId])
+  @@index([incomeId])
+  @@index([fixedExpenseId])
+  @@index([transferGroupId])
+  @@index([cardPaymentGroupId])
+  @@map("transactions")
+}
+
+/// Serie de transacoes recorrentes (spec 003, RF-25) - o "molde" de um lancamento manual
+/// recorrente. As ocorrencias sao `Transaction` reais, ligadas por `series_id`. `id` sem
+/// @default; sem coluna de exclusao - "encerrar" ajusta `recurrence_end_date` e apaga as
+/// ocorrencias futuras, mas a serie fica.
+model TransactionSeries {
+  id                  String              @id
+  userId              String              @map("user_id")
+  user                User                @relation(fields: [userId], references: [id])
+  accountId           String              @map("account_id")
+  account             Account             @relation(fields: [accountId], references: [id])
+  type                TransactionType
+  amountCents         Int                 @map("amount_cents")
+  currency            String              @default("BRL")
+  categoryId          String              @map("category_id")
+  category            Category            @relation(fields: [categoryId], references: [id])
+  notes               String?
+  recurrenceFrequency RecurrenceFrequency @map("recurrence_frequency")
+  recurrenceEveryN    Int                 @map("recurrence_every_n")
+  recurrenceEndDate   DateTime            @map("recurrence_end_date")
+  anchorDate          DateTime            @map("anchor_date")
+  updatedAt           DateTime            @updatedAt @map("updated_at")
+
+  transactions Transaction[]
+
+  @@index([userId])
+  @@index([categoryId])
+  @@map("transaction_series")
+}
+
+/// Forma de pagamento de uma simulacao de compra (domain/simulation/payment.method.ts,
+/// PAYMENT_METHODS). @map so nos valores com hifen, mesmo padrao de AccountKind.
+enum PaymentMethod {
+  cash
+  debit_card  @map("debit-card")
+  credit_card @map("credit-card")
+  pix
+}
+
+/// Cenario de projecao salvo ("Simulacao geral", spec 002, RF-32..RF-36). `id` sem @default.
+/// `adjustments` = array JSON de ScenarioAdjustment ({target,mode,label,amountCents,from,to});
+/// serializacao/validacao ficam no mapper + dominio, nao aqui.
+model ProjectionScenario {
+  id            String   @id
+  userId        String   @map("user_id")
+  user          User     @relation(fields: [userId], references: [id])
+  name          String
+  adjustments   Json
+  horizonMonths Int      @map("horizon_months")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@map("projection_scenarios")
+}
+
+/// "Recibo" da aplicacao de um cenario (spec 002, RF-37, RF-38, RF-40). No maximo um por
+/// usuario (@unique) - e o marcador de "aplicacao ativa". `snapshot_id`/`scenario_id` sao
+/// refs logicas (sem FK): o ciclo de vida e controlado pelos casos de uso.
+model ScenarioApplication {
+  id                     String   @id
+  userId                 String   @unique @map("user_id")
+  user                   User     @relation(fields: [userId], references: [id])
+  scenarioId             String   @map("scenario_id")
+  snapshotId             String   @map("snapshot_id")
+  appliedAt              DateTime @map("applied_at")
+  createdIncomeIds       Json     @map("created_income_ids")
+  createdFixedExpenseIds Json     @map("created_fixed_expense_ids")
+
+  @@map("scenario_applications")
+}
+
+/// Snapshot / ponto de restauracao dos dados do usuario (spec 002, RF-37, RF-40a). `payload`
+/// e o NDJSON de BackupRecord (mesmo formato da Fase 8); `record_counts` = contagem por tipo.
+/// Retencao 100% manual - nada apaga sozinho.
+model DataSnapshot {
+  id               String   @id
+  userId           String   @map("user_id")
+  user             User     @relation(fields: [userId], references: [id])
+  originScenarioId String?  @map("origin_scenario_id")
+  takenAt          DateTime @map("taken_at")
+  recordCounts     Json     @map("record_counts")
+  payload          String
+
+  @@index([userId])
+  @@map("data_snapshots")
+}
+
+/// Simulacao de compra (RF-9..RF-11, plan.md decisao 13). `id` sem @default. `approvedAt`
+/// nulo = ainda nao aprovada; `installments > 1` e recorrencia sao mutuamente exclusivos
+/// (reforcado no dominio, nao aqui).
+model PurchaseSimulation {
+  id                  String              @id
+  userId              String              @map("user_id")
+  user                User                @relation(fields: [userId], references: [id])
+  amountCents         Int                 @map("amount_cents")
+  currency            String              @default("BRL")
+  date                DateTime
+  categoryId          String              @map("category_id")
+  category            Category            @relation(fields: [categoryId], references: [id])
+  payment             PaymentMethod
+  installments        Int
+  recurrenceFrequency RecurrenceFrequency @map("recurrence_frequency")
+  recurrenceEveryN    Int                 @map("recurrence_every_n")
+  recurrenceEndDate   DateTime?           @map("recurrence_end_date")
+  accountId           String              @map("account_id")
+  account             Account             @relation(fields: [accountId], references: [id])
+  approvedAt          DateTime?           @map("approved_at")
+  updatedAt           DateTime            @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([categoryId])
+  @@map("purchase_simulations")
+}
+
+/// Categoria de lancamentos, por usuario (spec 003, RF-6..RF-8). `id` sem @default: quem gera
+/// e o IdGenerator do dominio (o `gen_random_uuid()` da migracao vale so pro backfill).
+/// `name` ja vem normalizado em MAIUSCULAS pelo `CategoryName`, entao o `@@unique` do banco
+/// e exatamente a unicidade logica que os casos de uso checam (CA-2, CA-10). Sem exclusao
+/// nesta entrega (RF-7): nao ha `onDelete` a decidir nos lancamentos.
+model Category {
+  id        String   @id
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id])
+  name      String
+  isDefault Boolean  @default(false) @map("is_default")
+  /// Marca a categoria de sistema "SALDO" (spec 011, RF-16, decisao 4.8), usada para
+  /// identificar essa categoria de forma estavel mesmo se o usuario a renomear.
+  isSystemBalance Boolean @default(false) @map("is_system_balance")
+  /// Marca a categoria de sistema "SALDO INICIAL" (spec 015), que recebe o lancamento gerado
+  /// automaticamente ao criar uma conta com saldo/gasto inicial > 0.
+  isSystemOpeningBalance Boolean @default(false) @map("is_system_opening_balance")
+  /// Marca a categoria de sistema "AJUSTE" (spec 015), que recebe o lancamento de correcao
+  /// gerado ao editar o saldo/gasto inicial de uma conta que ja tem lancamentos.
+  isSystemAdjustment Boolean @default(false) @map("is_system_adjustment")
+  /// Marca a categoria de sistema de transferencia entre contas (spec 016, RF-1), que recebe
+  /// as duas pontas de toda transferencia criada pela operacao nativa.
+  isSystemTransfer Boolean @default(false) @map("is_system_transfer")
+  /// Marca a categoria de sistema de pagamento de fatura de cartao de credito (spec 016,
+  /// RF-2), que recebe as duas pontas de todo pagamento criado pela operacao nativa.
+  isSystemCardPayment Boolean @default(false) @map("is_system_card_payment")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  incomes             Income[]
+  fixedExpenses       FixedExpense[]
+  spendingLimits      SpendingLimit[]
+  spendingLimitPlans  SpendingLimitPlan[]
+  transactions        Transaction[]
+  transactionSeries   TransactionSeries[]
+  purchaseSimulations PurchaseSimulation[]
+
+  @@unique([userId, name])
+  @@index([userId])
+  @@map("categories")
+}
+
+/// Chave de acesso do servidor MCP local (spec 004, RF-13, RF-17). `id` sem @default -
+/// mesma filosofia das outras entidades (gerado em `src/mcp/auth/access.key.ts`). So o
+/// HASH da chave e gravado (nunca o valor em claro - RF-13). `revokedAt` nulo = chave
+/// ativa; nao-nulo = chave da rotacao anterior, valida so dentro da janela de graca
+/// configurada em `mcp.http.config.ts` (regra aplicada pelo repositorio, nao aqui - "no
+/// maximo 1 ativa + 1 revogada" nao e uma constraint do banco). FK com `onDelete: Cascade`
+/// (RF-17): se o usuario for removido, a chave dele some junto.
+model McpAccessKey {
+  id        String    @id
+  userId    String    @map("user_id")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  keyHash   String    @map("key_hash")
+  createdAt DateTime  @map("created_at")
+  revokedAt DateTime? @map("revoked_at")
+
+  @@index([userId])
+  @@index([revokedAt])
+  @@map("mcp_access_keys")
+}
+
+/// Pre-registro de compra (spec 022, FR-021..FR-027): compra anotada no celular que ainda NAO
+/// e lancamento - tabela separada de `transactions`, nao entra em saldo/extrato/previsao.
+/// Todos os campos de dado sao opcionais (captura incompleta). Some ao ser aprovado ou
+/// descartado.
+model PreRegistration {
+  id                  String         @id
+  userId              String         @map("user_id")
+  user                User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  origin              String
+  amountCents         Int?           @map("amount_cents")
+  currency            String         @default("BRL")
+  description         String?
+  date                DateTime?
+  accountId           String?        @map("account_id")
+  paymentMethod       PaymentMethod? @map("payment_method")
+  installments        Int?
+  categoryId          String?        @map("category_id")
+  notes               String?
+  needsReview         Boolean        @default(false) @map("needs_review")
+  manualOnly          Boolean        @default(false) @map("manual_only")
+  /// Chave de deduplicacao da captura (chave da NFC-e, hash da notificacao). NAO e unica.
+  dedupKey            String?        @map("dedup_key")
+  possibleDuplicateOf String?        @map("possible_duplicate_of")
+  /// Respondido "sao compras diferentes" (spec 028): nunca agrupado nem remarcado como duplicata.
+  duplicateReviewed   Boolean        @default(false) @map("duplicate_reviewed")
+  sourceDevice        String?        @map("source_device")
+  createdAt           DateTime       @map("created_at")
+  updatedAt           DateTime       @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([userId, dedupKey])
+  @@map("pre_registrations")
+}
+
+/// Anexo de uma captura (spec 022): foto (bytea) ou texto original (notificacao, fala, OCR).
+model CaptureAttachment {
+  id                String   @id
+  userId            String   @map("user_id")
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  preRegistrationId String   @map("pre_registration_id")
+  kind              String
+  mimeType          String?  @map("mime_type")
+  content           String?
+  fileRef           String?  @map("file_ref")
+  imageData         Bytes?   @map("image_data")
+  sha256            String
+  createdAt         DateTime @map("created_at")
+
+  @@index([userId, preRegistrationId])
+  @@map("capture_attachments")
+}
+
+/// Celular pareado no modo conjunto (spec 022, FR-008/FR-014): token e chave do aparelho. O
+/// token fica so como hash; a chave do envelope fica cifrada com a chave local do desktop.
+model PairedDevice {
+  id            String    @id
+  userId        String    @map("user_id")
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  tokenHash     String    @map("token_hash")
+  keyCiphertext String    @map("key_ciphertext")
+  createdAt     DateTime  @map("created_at")
+  lastSeenAt    DateTime? @map("last_seen_at")
+  revokedAt     DateTime? @map("revoked_at")
+
+  @@index([userId])
+  @@map("paired_devices")
+}
+
+/// Log de alteracoes para a sincronizacao (spec 022, R4): preenchido por TRIGGERS em cada tabela
+/// sincronizavel (insert/update/delete), inclusive escritas da UI, do MCP e da propria sync.
+model SyncChange {
+  seq       BigInt   @id @default(autoincrement())
+  userId    String   @map("user_id")
+  entity    String
+  entityId  String   @map("entity_id")
+  kind      String
+  changedAt DateTime @default(now()) @map("changed_at")
+
+  @@index([userId, seq])
+  @@map("sync_changes")
+}
+
+/// Operacoes do celular ja aplicadas (idempotencia por `opId`, spec 022 FR-010).
+model SyncAppliedOp {
+  opId          String   @id @map("op_id")
+  deviceId      String   @map("device_id")
+  entity        String
+  entityId      String   @map("entity_id")
+  resultVersion String?  @map("result_version")
+  resultJson    String   @map("result_json")
+  appliedAt     DateTime @map("applied_at")
+
+  @@index([deviceId, entity, entityId])
+  @@map("sync_applied_ops")
+}
+
+/// Notificacao do usuario (spec 013, RF-5..RF-7a): historico de avisos emitidos por qualquer
+/// origem (tool MCP, capturas do celular). `source` e um identificador aberto (research R2b).
+/// `deliveredAt` = quando o toast nativo foi reivindicado (ou nasceu suprimido, RF-9a);
+/// `readAt` = quando o usuario marcou como lida. Fora do backup (research R6).
+model UserNotification {
+  id          String    @id
+  userId      String    @map("user_id")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  source      String
+  title       String?
+  message     String
+  createdAt   DateTime  @map("created_at")
+  deliveredAt DateTime? @map("delivered_at")
+  readAt      DateTime? @map("read_at")
+
+  @@index([userId, createdAt])
+  @@index([userId, deliveredAt])
+  @@map("user_notifications")
+}
+
+/// Recibo de captura (spec 027, R2/R4): uma linha por compra capturada da carteira, unica por
+/// `(userId, captureKey)`. Fica depois de o pre-registro ser aprovado/descartado (30 dias) para
+/// barrar reentregas. No desktop existe so para a porta `Database` ficar completa.
+model CaptureReceipt {
+  userId            String    @map("user_id")
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  captureKey        String    @map("capture_key")
+  preRegistrationId String    @map("pre_registration_id")
+  resolution        String
+  captureVersion    String?   @map("capture_version")
+  createdAt         DateTime  @map("created_at")
+  resolvedAt        DateTime? @map("resolved_at")
+
+  @@id([userId, captureKey])
+  @@index([userId, preRegistrationId])
+  @@map("capture_receipts")
+}
+
+/// Destino de um pre-registro removido (spec 027, R6): aprovado ou descartado.
+model PreRegistrationOutcome {
+  userId            String   @map("user_id")
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  preRegistrationId String   @map("pre_registration_id")
+  outcome           String
+  transactionId     String?  @map("transaction_id")
+  at                DateTime
+
+  @@id([userId, preRegistrationId])
+  @@map("pre_registration_outcomes")
+}

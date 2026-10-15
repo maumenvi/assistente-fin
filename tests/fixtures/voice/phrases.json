@@ -1,0 +1,352 @@
+[
+ {
+  "phrase": "Fiz compra no supermercado, gastei 145.30 reais, credito parcelado 2x no iti",
+  "amountCents": 14530,
+  "paymentMethod": "credit-card",
+  "accountHint": "iti",
+  "installments": 2
+ },
+ {
+  "phrase": "Comprei queijo, ficou em 65 reais no pix no itau",
+  "amountCents": 6500,
+  "paymentMethod": "pix",
+  "accountHint": "itau",
+  "installments": null
+ },
+ {
+  "phrase": "Gastei 42,90 no almoço, no débito do nubank",
+  "amountCents": 4290,
+  "paymentMethod": "debit-card",
+  "accountHint": "nubank",
+  "installments": null
+ },
+ {
+  "phrase": "Paguei a conta de luz, 230 reais no pix pelo itaú",
+  "amountCents": 23000,
+  "paymentMethod": "pix",
+  "accountHint": "itau",
+  "installments": null
+ },
+ {
+  "phrase": "Comprei um tênis em três vezes no cartão do inter, 399 reais",
+  "amountCents": 39900,
+  "paymentMethod": "credit-card",
+  "accountHint": "inter",
+  "installments": 3
+ },
+ {
+  "phrase": "Uber de 18,50 no crédito do nubank",
+  "amountCents": 1850,
+  "paymentMethod": "credit-card",
+  "accountHint": "nubank",
+  "installments": null
+ },
+ {
+  "phrase": "Gasolina, 200 reais no débito do bradesco",
+  "amountCents": 20000,
+  "paymentMethod": "debit-card",
+  "accountHint": "bradesco",
+  "installments": null
+ },
+ {
+  "phrase": "Comprei pão na padaria, 12 reais em dinheiro",
+  "amountCents": 1200,
+  "paymentMethod": "cash",
+  "accountHint": null,
+  "installments": null
+ },
+ {
+  "phrase": "Farmácia 57,80 no pix do santander",
+  "amountCents": 5780,
+  "paymentMethod": "pix",
+  "accountHint": "santander",
+  "installments": null
+ },
+ {
+  "phrase": "Fiz compra na feira, gastei 36 reais no pix no itau",
+  "amountCents": 3600,
+  "paymentMethod": "pix",
+  "accountHint": "itau",
+  "installments": null
+ },
+ {
+  "phrase": "Comprei uma televisão, 2.499,00 no crédito parcelado em 10 vezes no nubank",
+  "amountCents": 249900,
+  "paymentMethod": "credit-card",
+  "accountHint": "nubank",
+  "installments": 10
+ },
+ {
+  "phrase": "Jantar 89,90 no crédito do itaú",
+  "amountCents": 8990,
+  "paymentMethod": "credit-card",
+  "accountHint": "itau",
+  "installments": null
+ },
+ {
+  "phrase": "Paguei o ifood, 45 reais no crédito do nubank",
+  "amountCents": 4500,
+  "paymentMethod": "credit-card",
+  "accountHint": "nubank",
+  "installments": null
+ },
+ {
+  "phrase": "Comprei remédio, ficou em 23,40 no débito da caixa",
+  "amountCents": 2340,
+  "paymentMethod": "debit-card",
+  "accountHint": "caixa",
+  "installments": null
+ },
+ {
+  "phrase": "Gastei 150 reais no mercado no pix do inter",
+  "amountCents": 15000,
+  "paymentMethod": "pix",
+  "accountHint": "inter",
+  "installments": null
+ },
+ {
+  "phrase": "Comprei uma camiseta, 79,90 no crédito em 2x no iti",
+  "amountCents": 7990,
+  "paymentMethod": "credit-card",
+  "accountHint": "iti",
+  "installments": 2
+ },
+ {
+  "phrase": "Café 8,50 no pix no nubank",
+  "amountCents": 850,
+  "paymentMethod": "pix",
+  "accountHint": "nubank",
+  "installments": null
+ },
+ {
+  "phrase": "Comprei livros, 120 reais parcelado em 3 vezes no itaú",
+  "amountCents": 12000,
+  "paymentMethod": "credit-card",
+  "accountHint": "itau",
+  "installments": 3
+ },
+ {
+  "phrase": "Paguei o estacionamento, 15 reais no débito do santander",
+  "amountCents": 1500,
+  "paymentMethod": "debit-card",
+  "accountHint": "santander",
+  "installments": null
+ },
+ {
+  "phrase": "Lanche de 25 reais em dinheiro",
+  "amountCents": 2500,
+  "paymentMethod": "cash",
+  "accountHint": null,
+  "installments": null
+ },
+ {
+  "phrase": "Fiz compra no açougue, gastei 98,70 no pix pelo bradesco",
+  "amountCents": 9870,
+  "paymentMethod": "pix",
+  "accountHint": "bradesco",
+  "installments": null
+ },
+ {
+  "phrase": "Comprei ração, 110 reais no crédito do c6",
+  "amountCents": 11000,
+  "paymentMethod": "credit-card",
+  "accountHint": "c6",
+  "installments": null
+ },
+ {
+  "phrase": "Gastei 60 reais na farmácia no débito do itau",
+  "amountCents": 6000,
+  "paymentMethod": "debit-card",
+  "accountHint": "itau",
+  "installments": null
+ },
+ {
+  "phrase": "Comprei um celular, 1.899,90 parcelado em 12x no nubank",
+  "amountCents": 189990,
+  "paymentMethod": "credit-card",
+  "accountHint": "nubank",
+  "installments": 12
+ },
+ {
+  "phrase": "Padaria 14,30 no pix do inter",
+  "amountCents": 1430,
+  "paymentMethod": "pix",
+  "accountHint": "inter",
+  "installments": null
+ },
+ {
+  "phrase": "Paguei a internet, 99,90 no débito do bradesco",
+  "amountCents": 9990,
+  "paymentMethod": "debit-card",
+  "accountHint": "bradesco",
+  "installments": null
+ },
+ {
+  "phrase": "Comprei flores, ficou em 40 reais no pix no picpay",
+  "amountCents": 4000,
+  "paymentMethod": "pix",
+  "accountHint": "picpay",
+  "installments": null
+ },
+ {
+  "phrase": "Gastei sessenta e cinco reais no pix do itau",
+  "amountCents": 6500,
+  "paymentMethod": "pix",
+  "accountHint": "itau",
+  "installments": null
+ },
+ {
+  "phrase": "Comprei sapato, cento e cinquenta reais no crédito em 2 vezes no iti",
+  "amountCents": 15000,
+  "paymentMethod": "credit-card",
+  "accountHint": "iti",
+  "installments": 2
+ },
+ {
+  "phrase": "Almoço de trinta e dois reais e cinquenta centavos no débito do nubank",
+  "amountCents": 3250,
+  "paymentMethod": "debit-card",
+  "accountHint": "nubank",
+  "installments": null
+ },
+ {
+  "phrase": "Fiz compras no atacadão, gastei 312,45 no crédito do itaú",
+  "amountCents": 31245,
+  "paymentMethod": "credit-card",
+  "accountHint": "itau",
+  "installments": null
+ },
+ {
+  "phrase": "Comprei tinta, 87 reais no pix pela caixa",
+  "amountCents": 8700,
+  "paymentMethod": "pix",
+  "accountHint": "caixa",
+  "installments": null
+ },
+ {
+  "phrase": "Pizza 72,00 no crédito do santander",
+  "amountCents": 7200,
+  "paymentMethod": "credit-card",
+  "accountHint": "santander",
+  "installments": null
+ },
+ {
+  "phrase": "Gastei 19,90 no cinema no pix do nubank",
+  "amountCents": 1990,
+  "paymentMethod": "pix",
+  "accountHint": "nubank",
+  "installments": null
+ },
+ {
+  "phrase": "Comprei material escolar, 256,30 parcelado em 3x no inter",
+  "amountCents": 25630,
+  "paymentMethod": "credit-card",
+  "accountHint": "inter",
+  "installments": 3
+ },
+ {
+  "phrase": "Paguei o dentista, 350 reais no pix pelo itaú",
+  "amountCents": 35000,
+  "paymentMethod": "pix",
+  "accountHint": "itau",
+  "installments": null
+ },
+ {
+  "phrase": "Comprei um presente, ficou em 150 reais no crédito do nubank",
+  "amountCents": 15000,
+  "paymentMethod": "credit-card",
+  "accountHint": "nubank",
+  "installments": null
+ },
+ {
+  "phrase": "Gasolina 180,00 no crédito do c6",
+  "amountCents": 18000,
+  "paymentMethod": "credit-card",
+  "accountHint": "c6",
+  "installments": null
+ },
+ {
+  "phrase": "Fiz compra no hortifruti, gastei 47,60 no débito da caixa",
+  "amountCents": 4760,
+  "paymentMethod": "debit-card",
+  "accountHint": "caixa",
+  "installments": null
+ },
+ {
+  "phrase": "Comprei um fone, 249,90 no crédito em 5x no iti",
+  "amountCents": 24990,
+  "paymentMethod": "credit-card",
+  "accountHint": "iti",
+  "installments": 5
+ },
+ {
+  "phrase": "Sorvete 16 reais em dinheiro",
+  "amountCents": 1600,
+  "paymentMethod": "cash",
+  "accountHint": null,
+  "installments": null
+ },
+ {
+  "phrase": "Paguei a academia, 110 reais no débito do itau",
+  "amountCents": 11000,
+  "paymentMethod": "debit-card",
+  "accountHint": "itau",
+  "installments": null
+ },
+ {
+  "phrase": "Comprei vinho, 69,90 no pix do bradesco",
+  "amountCents": 6990,
+  "paymentMethod": "pix",
+  "accountHint": "bradesco",
+  "installments": null
+ },
+ {
+  "phrase": "Gastei 28 reais no uber no crédito do nubank",
+  "amountCents": 2800,
+  "paymentMethod": "credit-card",
+  "accountHint": "nubank",
+  "installments": null
+ },
+ {
+  "phrase": "Comprei uma cadeira, 450 reais parcelado em 4 vezes no santander",
+  "amountCents": 45000,
+  "paymentMethod": "credit-card",
+  "accountHint": "santander",
+  "installments": 4
+ },
+ {
+  "phrase": "Fiz compra na farmácia, gastei 33,20 no pix no inter",
+  "amountCents": 3320,
+  "paymentMethod": "pix",
+  "accountHint": "inter",
+  "installments": null
+ },
+ {
+  "phrase": "Barbeiro 45 reais no pix do nubank",
+  "amountCents": 4500,
+  "paymentMethod": "pix",
+  "accountHint": "nubank",
+  "installments": null
+ },
+ {
+  "phrase": "Comprei pneus, 1.200,00 no crédito em 6x no itaú",
+  "amountCents": 120000,
+  "paymentMethod": "credit-card",
+  "accountHint": "itau",
+  "installments": 6
+ },
+ {
+  "phrase": "Paguei o condomínio, 780 reais no pix pelo bradesco",
+  "amountCents": 78000,
+  "paymentMethod": "pix",
+  "accountHint": "bradesco",
+  "installments": null
+ },
+ {
+  "phrase": "Comprei chocolate, 9,99 no débito do c6",
+  "amountCents": 999,
+  "paymentMethod": "debit-card",
+  "accountHint": "c6",
+  "installments": null
+ }
+]

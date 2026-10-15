@@ -1,0 +1,25 @@
+{
+  "_nota": "Notificacoes SINTETICAS no formato do Google Wallet em pt-BR (spec 022, T130). Complementar com notificacoes reais quando houver.",
+  "cases": [
+    {
+      "name": "compra por aproximacao (titulo = estabelecimento)",
+      "payload": { "packageName": "com.google.android.apps.walletnfcrel", "postTime": 1790330400000, "title": "PADARIA PAO QUENTE", "text": "R$ 45,90 com Visa •••• 4412" },
+      "expected": { "origin": "wallet", "amountCents": 4590, "description": "PADARIA PAO QUENTE", "accountHint": "final 4412", "confidence": "high" }
+    },
+    {
+      "name": "compra com credito explicito",
+      "payload": { "packageName": "com.google.android.apps.walletnfcrel", "postTime": 1790330400000, "title": "Google Wallet", "text": "Você pagou R$ 1.234,56 em Mercado Bom Preço com o cartão de crédito Mastercard ••1234" },
+      "expected": { "origin": "wallet", "amountCents": 123456, "description": "Mercado Bom Preço", "accountHint": "final 1234", "paymentMethod": "credit-card", "confidence": "high" }
+    },
+    {
+      "name": "pix",
+      "payload": { "packageName": "com.google.android.apps.walletnfcrel", "postTime": 1790330400000, "title": "Pix enviado", "text": "R$ 150,00 para Maria da Silva" },
+      "expected": { "origin": "wallet", "amountCents": 15000, "description": "Maria da Silva", "paymentMethod": "pix", "confidence": "high" }
+    },
+    {
+      "name": "formato desconhecido",
+      "payload": { "packageName": "com.google.android.apps.walletnfcrel", "postTime": 1790330400000, "title": "Google Wallet", "text": "Seu cartão foi adicionado" },
+      "expected": { "origin": "wallet", "notes": "Google Wallet — Seu cartão foi adicionado", "confidence": "low" }
+    }
+  ]
+}
