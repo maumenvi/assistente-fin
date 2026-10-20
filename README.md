@@ -175,3 +175,6 @@ Model Context Protocol (SDK oficial) · Fastify · Playwright · electron-builde
 - LinkedIn: [Marco Aurélio Tôrres Vieira](https://www.linkedin.com/in/marco-aurélio-tôrres-vieira-294524b8)
 
 Aberto a conversar sobre o produto, licenciamento ou oportunidades.
+
+
+[![M8ven Verified](https://m8ven.ai/badge/mcp/maumenvi-assistente-fin-evoh6m?variant=verified&v=6c218a0d5b8cc593d8aad864cef0dc70)](https://m8ven.ai/mcp/maumenvi-assistente-fin-evoh6m?s=readme)
