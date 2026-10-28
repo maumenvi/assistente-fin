@@ -27,48 +27,48 @@ só o texto do modelo é roteirizado.
 
 ### Estratégia
 
-O princípio é **deixar o modelo decidir *o que perguntar* e o código garantir *o que vale***: o modelo escolhe ferramentas e redige a
+O princípio é **deixar o modelo decidir *o que consultar* e o código garantir *o que vale***: o modelo escolhe ferramentas e redige a
 resposta; quem busca dados, faz contas, confere números, grava e libera acesso é código determinístico e testado.
 
 ```mermaid
 flowchart LR
-  U["Pergunta"] --> R["Rotear<br/>intenção"]
+  U["Pergunta"] --> R["Rotear<br/>identificar a intenção"]
   R --> RE["Raciocinar<br/>modelo + ferramentas"]
-  RE <--> T["Ferramentas<br/>consultas · cálculo"]
-  RE --> A["Responder<br/>verifica números"]
-  A --> M["Resposta<br/>(valor não conferido é ocultado)"]
-  RE -. propor .-> P["Plano de alteração<br/>aprovar · desfazer"]
+  RE <--> T["Ferramentas<br/>consultas e cálculos"]
+  RE --> A["Responder e<br/>verificar números"]
+  A --> M["Resposta<br/>(valor não conferido fica oculto)"]
+  RE -. propor .-> P["Plano de alteração<br/>aprovar ou desfazer"]
   RE -. precisa de arquivo .-> F["Cartão no chat<br/>(pasta/arquivo)"]
 ```
 
 - **Grafo declarado como dado**: nós (`route`, `react`, `tools`, `respond`) e arestas são dados validados em tempo de montagem, com o
-  diagrama gerado do próprio código; um runner único cuida de orçamento, cancelamento, checkpoint e trace por passo.
+  diagrama gerado do próprio código; um executor único cuida de orçamento, cancelamento, ponto de retomada e registro de cada passo.
 - **Intenção primeiro**: regras baratas classificam o pedido (consulta, preferência, alteração) e só então o modelo rápido desempata;
   **cada intenção enxerga só as ferramentas dela** (um pedido de consulta nunca grava, um de preferência nunca consulta dados).
 - **Ferramentas pequenas e tipadas**: consultas aos mesmos casos de uso das telas, sem caminho paralelo. Contas (soma, variação,
   projeção) passam por `calculate`/`compare_periods` — o modelo não faz aritmética.
 - **Modelo em 3 níveis com roteamento por custo**: alto, médio e básico por passo, com troca automática para o modelo alternativo
-  quando o principal falha, e telemetria de tokens/custo por nível.
+  quando o principal falha, e medição de tokens e custo por nível.
 - **Propor, depois confirmar**: toda escrita vira um *plano* revisável (antes/depois, alertas), aplicado numa transação só.
 - **Contexto sob controle**: preferências do usuário entram no prompt; conversas longas são **compactadas** em segundo plano (70% da
   janela; 50% em modelos locais pequenos) com resumo **sem valores em reais**, que são sempre consultados de novo.
-- **Orçamento por pedido**: passos, tempo, custo e tokens; ao estourar, o agente entrega o que apurou e oferece **Continuar** do
-  checkpoint. Até 5 conversas executam em paralelo, com aviso no desktop quando uma termina ou espera a pessoa.
+- **Orçamento por pedido**: passos, tempo, custo e tokens; ao estourar, o agente entrega o que apurou e oferece **Continuar** a partir
+  do ponto de retomada. Até 5 conversas executam em paralelo, com aviso no desktop quando uma termina ou espera a pessoa.
 - **Qualidade medida, não suposta**: suíte de avaliação de regressão sobre base sintética (exatidão, zero valores inventados, zero
   escritas indevidas) que roda também com um prompt degradado, para provar que os testes pegam a piora.
 
-### Guardrails
+### Guardrails (proteções)
 
-| Risco | Como é barrado (por construção, com teste) |
+| Risco | Como é barrado (por construção, com testes) |
 |---|---|
 | **Número inventado** | *Livro-razão de fatos*: cada valor, data e quantidade devolvidos pelas ferramentas (e as figuras que o usuário escreveu) é registrado; `verifyFigures` confere a resposta e **oculta** o que não bater, com uma correção automática antes de entregar. Datas do período e contagens de itens também são fatos. |
 | **Escrita indevida** | O agente **nunca grava direto**: só `propose_changes`, que cria um plano pendente. Aprovar é um clique do usuário; item cujo dado mudou desde a proposta é pulado; plano vence em 24 h; dá para **desfazer** por 7 dias. Autonomia por tipo de ação **começa desligada** e é limitada em valor e quantidade; excluir, transferir e pagar fatura **sempre** pedem aprovação; itens vindos de anexo nunca são aprovados sozinhos. |
 | **Vazamento entre usuários** | O `userId` vem **da sessão**, nunca do modelo nem do schema da ferramenta; ferramentas rejeitam esse campo na montagem. |
 | **Ferramenta com poder demais** | Registros separados por **efeito** (consulta, memória, planejamento, externo, arquivo): cada intenção só recebe o seu, e um registro recusa ferramentas de efeito não permitido. |
-| **Prompt injection** | Texto de anexo, arquivo ou ferramenta externa entra como **dado** (`<dados>` com neutralização), nunca como instrução; padrões de ordem embutida são marcados e aparecem na tela de execução. |
-| **Capacidade externa (MCP/skill)** | Nada conecta antes de **aprovação** com cartão que mostra o que sai do aparelho; credenciais vão direto ao cofre, nunca ao chat; mudança de identidade da capacidade bloqueia o uso até reaprovar; saída filtrada por *egress guard*. |
-| **Acesso a arquivos** | Permissão **só por clique** na UI (nenhuma ferramenta concede); `..`, links simbólicos para fora, dados do próprio app, `~/.ssh`, `.env*` e pseudo-sistemas são barrados; criar nunca sobrescreve; editar fora do git exige **prévia aprovada**; o registro da execução guarda só o caminho, nunca o conteúdo. |
-| **Privacidade** | Consentimento explícito antes de qualquer envio à nuvem e outro, separado, para anexos; "somente local" bloqueia a nuvem; preferências privadas nunca vão a modelo de nuvem; segredos nunca entram em log, trace nem estado gravado. |
+| **Injeção de instruções (*prompt injection*)** | Texto de anexo, arquivo ou ferramenta externa entra como **dado** (`<dados>` com neutralização), nunca como instrução; padrões de ordem embutida são marcados e aparecem na tela de execução. |
+| **Capacidade externa (MCP/skill)** | Nada conecta antes de **aprovação** com cartão que mostra o que sai do aparelho; credenciais vão direto ao cofre, nunca ao chat; mudança de identidade da capacidade bloqueia o uso até reaprovar; saída filtrada por um filtro de saída (*egress guard*). |
+| **Acesso a arquivos** | Permissão **só por clique** na UI (nenhuma ferramenta concede); `..`, links simbólicos para fora, dados do próprio app, `~/.ssh`, `.env*` e pseudo-sistemas são barrados; criar nunca sobrescreve; editar fora do git exige **prévia aprovada**; o histórico da execução guarda só o caminho, nunca o conteúdo. |
+| **Privacidade** | Consentimento explícito antes de qualquer envio à nuvem e outro, separado, para anexos; "somente local" bloqueia a nuvem; preferências privadas nunca vão a modelo de nuvem; segredos nunca entram em log, no histórico dos passos nem no estado gravado. |
 | **Relatório com dado falso** | `write_report` recebe o relatório como **dados** (nunca HTML do modelo), confere todo número contra as consultas da execução antes de gravar e escapa todo texto; o `.html` não tem script nem recurso externo. |
 | **Execução fora de controle** | Orçamento de passos, tempo, custo e tokens; teto de consultas por resposta; no máximo 5 execuções simultâneas; parar a qualquer momento; execuções órfãs de uma queda viram "interrompidas" e podem continuar. |
 | **Falha do provedor** | Erros de domínio com mensagem acionável (chave recusada, crédito, sem rede), nova tentativa com recuo, modelo alternativo e aviso de qual respondeu. |
