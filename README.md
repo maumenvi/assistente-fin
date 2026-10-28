@@ -10,6 +10,69 @@ que só valem depois da aprovação — com os números sempre conferidos contra
 > (domínio e casos de uso), não o produto inteiro. O app completo (desktop, Android, MCP, sync, empacotamento)
 > é comercializado e vive em repositório privado. Licença não comercial — veja [LICENSE](LICENSE).
 
+## Agente de IA
+
+O diferencial do produto: um agente que **conversa sobre as finanças do usuário sem inventar números e sem mexer em nada sem
+aprovação**. Roda no desktop e no celular, com o modelo à escolha (OpenRouter, Google Gemini ou Ollama local — com "somente local"
+nada sai do computador). Visão técnica completa em [docs/agent/README.md](docs/agent/README.md).
+
+| Pergunta com resposta conferida | Pede acesso à pasta (uma única ação) |
+|---|---|
+| ![Chat](docs/media/agente-chat.png) | ![Permissão de pasta](docs/media/agente-permissao-pasta.png) |
+| **Relatório salvo no computador** | **O `.html` gerado (gráfico em SVG, abre offline)** |
+| ![Relatório salvo](docs/media/agente-relatorio-salvo.png) | ![Relatório HTML](docs/media/agente-relatorio-html.png) |
+
+Capturas do app real com um servidor de LLM de teste: as consultas (cartões "Consultei"), os números e os arquivos são os do app;
+só o texto do modelo é roteirizado.
+
+### Estratégia
+
+O princípio é **deixar o modelo decidir *o que perguntar* e o código garantir *o que vale***: o modelo escolhe ferramentas e redige a
+resposta; quem busca dados, faz contas, confere números, grava e libera acesso é código determinístico e testado.
+
+```mermaid
+flowchart LR
+  U["Pergunta"] --> R["route<br/>intenção"]
+  R --> RE["react<br/>modelo + ferramentas"]
+  RE <--> T["tools<br/>consultas · cálculo"]
+  RE --> A["respond<br/>verifica números"]
+  A --> M["Resposta<br/>(valor não conferido é ocultado)"]
+  RE -. propor .-> P["Plano de alteração<br/>aprovar · desfazer"]
+  RE -. precisa de arquivo .-> F["Cartão no chat<br/>(pasta/arquivo)"]
+```
+
+- **Grafo declarado como dado**: nós (`route`, `react`, `tools`, `respond`) e arestas são dados validados em tempo de montagem, com o
+  diagrama gerado do próprio código; um runner único cuida de orçamento, cancelamento, checkpoint e trace por passo.
+- **Intenção primeiro**: regras baratas classificam o pedido (consulta, preferência, alteração) e só então o modelo rápido desempata;
+  **cada intenção enxerga só as ferramentas dela** (um pedido de consulta nunca grava, um de preferência nunca consulta dados).
+- **Ferramentas pequenas e tipadas**: consultas aos mesmos casos de uso das telas, sem caminho paralelo. Contas (soma, variação,
+  projeção) passam por `calculate`/`compare_periods` — o modelo não faz aritmética.
+- **Modelo em 3 níveis com roteamento por custo**: alto, médio e básico por passo, com troca automática para o modelo alternativo
+  quando o principal falha, e telemetria de tokens/custo por nível.
+- **Propor, depois confirmar**: toda escrita vira um *plano* revisável (antes/depois, alertas), aplicado numa transação só.
+- **Contexto sob controle**: preferências do usuário entram no prompt; conversas longas são **compactadas** em segundo plano (70% da
+  janela; 50% em modelos locais pequenos) com resumo **sem valores em reais**, que são sempre consultados de novo.
+- **Orçamento por pedido**: passos, tempo, custo e tokens; ao estourar, o agente entrega o que apurou e oferece **Continuar** do
+  checkpoint. Até 5 conversas executam em paralelo, com aviso no desktop quando uma termina ou espera a pessoa.
+- **Qualidade medida, não suposta**: suíte de avaliação de regressão sobre base sintética (exatidão, zero valores inventados, zero
+  escritas indevidas) que roda também com um prompt degradado, para provar que os testes pegam a piora.
+
+### Guardrails
+
+| Risco | Como é barrado (por construção, com teste) |
+|---|---|
+| **Número inventado** | *Livro-razão de fatos*: cada valor, data e quantidade devolvidos pelas ferramentas (e as figuras que o usuário escreveu) é registrado; `verifyFigures` confere a resposta e **oculta** o que não bater, com uma correção automática antes de entregar. Datas do período e contagens de itens também são fatos. |
+| **Escrita indevida** | O agente **nunca grava direto**: só `propose_changes`, que cria um plano pendente. Aprovar é um clique do usuário; item cujo dado mudou desde a proposta é pulado; plano vence em 24 h; dá para **desfazer** por 7 dias. Autonomia por tipo de ação **começa desligada** e é limitada em valor e quantidade; excluir, transferir e pagar fatura **sempre** pedem aprovação; itens vindos de anexo nunca são aprovados sozinhos. |
+| **Vazamento entre usuários** | O `userId` vem **da sessão**, nunca do modelo nem do schema da ferramenta; ferramentas rejeitam esse campo na montagem. |
+| **Ferramenta com poder demais** | Registros separados por **efeito** (consulta, memória, planejamento, externo, arquivo): cada intenção só recebe o seu, e um registro recusa ferramentas de efeito não permitido. |
+| **Prompt injection** | Texto de anexo, arquivo ou ferramenta externa entra como **dado** (`<dados>` com neutralização), nunca como instrução; padrões de ordem embutida são marcados e aparecem na tela de execução. |
+| **Capacidade externa (MCP/skill)** | Nada conecta antes de **aprovação** com cartão que mostra o que sai do aparelho; credenciais vão direto ao cofre, nunca ao chat; mudança de identidade da capacidade bloqueia o uso até reaprovar; saída filtrada por *egress guard*. |
+| **Acesso a arquivos** | Permissão **só por clique** na UI (nenhuma ferramenta concede); `..`, links simbólicos para fora, dados do próprio app, `~/.ssh`, `.env*` e pseudo-sistemas são barrados; criar nunca sobrescreve; editar fora do git exige **prévia aprovada**; o registro da execução guarda só o caminho, nunca o conteúdo. |
+| **Privacidade** | Consentimento explícito antes de qualquer envio à nuvem e outro, separado, para anexos; "somente local" bloqueia a nuvem; preferências privadas nunca vão a modelo de nuvem; segredos nunca entram em log, trace nem estado gravado. |
+| **Relatório com dado falso** | `write_report` recebe o relatório como **dados** (nunca HTML do modelo), confere todo número contra as consultas da execução antes de gravar e escapa todo texto; o `.html` não tem script nem recurso externo. |
+| **Execução fora de controle** | Orçamento de passos, tempo, custo e tokens; teto de consultas por resposta; no máximo 5 execuções simultâneas; parar a qualquer momento; execuções órfãs de uma queda viram "interrompidas" e podem continuar. |
+| **Falha do provedor** | Erros de domínio com mensagem acionável (chave recusada, crédito, sem rede), nova tentativa com recuo, modelo alternativo e aviso de qual respondeu. |
+
 ## Em funcionamento
 
 ![Tour pelo desktop](docs/media/desktop-tour.gif)
@@ -21,17 +84,6 @@ que só valem depois da aprovação — com os números sempre conferidos contra
 | ![Limites](docs/media/desktop-limites.png) | ![Gastos fixos](docs/media/desktop-gastos-fixos.png) |
 | **Cartão de crédito** | **Projeções** |
 | ![Cartão](docs/media/desktop-cartao.png) | ![Projeções](docs/media/desktop-projecoes.png) |
-
-### Agente de IA
-
-| Pergunta com resposta conferida | Pede acesso à pasta (uma única ação) |
-|---|---|
-| ![Chat](docs/media/agente-chat.png) | ![Permissão de pasta](docs/media/agente-permissao-pasta.png) |
-| **Relatório salvo no computador** | **O `.html` gerado (gráfico em SVG, abre offline)** |
-| ![Relatório salvo](docs/media/agente-relatorio-salvo.png) | ![Relatório HTML](docs/media/agente-relatorio-html.png) |
-
-Capturas do app real com um servidor de LLM de teste: as consultas (cartões "Consultei"), os números e os arquivos são os do app;
-só o texto do modelo é roteirizado.
 
 ### App Android
 
@@ -88,42 +140,6 @@ flowchart LR
   end
   SQ <-->|"sync incremental"| Hub
 ```
-
-## Agente de IA
-
-O agente roda como um **grafo de nós** declarado como dado (rota → raciocínio com ferramentas → resposta verificada), sobre portas
-(`LlmPort`, `ToolPort`, armazenamento), com modelo em **3 níveis** (alto/médio/básico) em OpenRouter, Google Gemini ou Ollama local.
-Visão técnica completa em [docs/agent/README.md](docs/agent/README.md).
-
-```mermaid
-flowchart LR
-  U["Pergunta"] --> R["route<br/>intenção"]
-  R --> RE["react<br/>modelo + ferramentas"]
-  RE <--> T["tools<br/>consultas · calculate"]
-  RE --> A["respond<br/>verifica números"]
-  A --> M["Resposta<br/>(valor não conferido é ocultado)"]
-  RE -. propor .-> P["Plano de alteração<br/>aprovar · desfazer"]
-  RE -. precisa de arquivo .-> F["Cartão de permissão<br/>(pasta/arquivo)"]
-```
-
-- **Números verificados**: um *livro-razão de fatos* guarda cada valor, data e quantidade devolvidos pelas ferramentas (e as figuras que
-  o usuário escreveu); `verifyFigures` compara a resposta com ele e mascara o que não conferir. Contas passam por `calculate`.
-- **Escrita só com aprovação**: o agente nunca grava direto. `propose_changes` cria um **plano** com antes/depois e alertas
-  (duplicata, valor diferente do pedido, estouro de limite); aprovar aplica tudo numa transação, e dá para **desfazer** por 7 dias.
-  Autonomia por tipo de ação (padrão desligada) e regras de categorização aprendidas com o uso.
-- **Preferências e memória**: o agente guarda preferências ditas ou percebidas (com origem, privacidade e apagar tudo) e **compacta**
-  conversas longas em segundo plano, sem valores em reais no resumo.
-- **Capacidades dinâmicas**: se o app não resolve um pedido, o agente procura uma capacidade (servidor MCP remoto ou *skill*) e mostra
-  um cartão com o que sai do aparelho; nada conecta antes da aprovação, e mudança de identidade bloqueia o uso até aprovar de novo.
-- **Anexos e arquivos**: lê CSV, XLSX, PDF e imagens (extração local; só vai à nuvem com consentimento próprio) e, no desktop,
-  **pastas do computador mediante permissão no chat** — `..`, links simbólicos e dados sensíveis são barrados, editar fora do git
-  pede prévia, e todo conteúdo lido é tratado como **dado, nunca instrução** (marca de injeção).
-- **Relatórios**: `write_report` monta `.html` autocontido (gráficos em SVG, tema claro/escuro, sem script) ou `.md`; **todo número do
-  relatório é conferido contra as consultas** antes de gravar.
-- **Várias conversas ao mesmo tempo**, com estado por conversa, notificação do desktop quando uma termina ou espera resposta, e menu
-  da bandeja com os chats em andamento.
-- **Qualidade medida**: avaliação de regressão com cenários sobre base sintética (exatidão, zero valores inventados, zero escritas
-  indevidas) e telemetria de custo/tokens por nível de modelo.
 
 ## Arquitetura em camadas
 
