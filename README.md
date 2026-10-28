@@ -32,10 +32,10 @@ resposta; quem busca dados, faz contas, confere números, grava e libera acesso 
 
 ```mermaid
 flowchart LR
-  U["Pergunta"] --> R["route<br/>intenção"]
-  R --> RE["react<br/>modelo + ferramentas"]
-  RE <--> T["tools<br/>consultas · cálculo"]
-  RE --> A["respond<br/>verifica números"]
+  U["Pergunta"] --> R["Rotear<br/>intenção"]
+  R --> RE["Raciocinar<br/>modelo + ferramentas"]
+  RE <--> T["Ferramentas<br/>consultas · cálculo"]
+  RE --> A["Responder<br/>verifica números"]
   A --> M["Resposta<br/>(valor não conferido é ocultado)"]
   RE -. propor .-> P["Plano de alteração<br/>aprovar · desfazer"]
   RE -. precisa de arquivo .-> F["Cartão no chat<br/>(pasta/arquivo)"]
