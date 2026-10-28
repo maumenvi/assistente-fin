@@ -5,16 +5,19 @@ import { TRANSACTION_TYPES } from '../../domain/transaction/transaction.type.ts'
 import { PAYMENT_METHODS } from '../../domain/simulation/payment.method.ts';
 import { PRE_REGISTRATION_ORIGINS } from '../../domain/pre-registration/pre.registration.origin.ts';
 import { CAPTURE_ATTACHMENT_KINDS } from '../../domain/pre-registration/capture.attachment.kind.ts';
+import { PREFERENCE_EFFECTS } from '../../domain/preference/preference.effect.ts';
+import { PREFERENCE_ORIGINS } from '../../domain/preference/preference.origin.ts';
+import { PREFERENCE_STATUSES } from '../../domain/preference/preference.status.ts';
 
 /**
  * Versao do formato de backup (RF-17, RF-18) - todo record carrega a mesma no campo
  * `schemaVersion` (comeca no `header`); `ImportBackupUseCase` rejeita qualquer valor
  * diferente (`InvalidBackupError`) em vez de tentar migrar formatos antigos nesta entrega.
  */
-export const BACKUP_SCHEMA_VERSION = 3;
+export const BACKUP_SCHEMA_VERSION = 5;
 
-/** Versoes que o importador ainda aceita (v2 = sem pre-registros, spec 022). */
-export const SUPPORTED_BACKUP_SCHEMA_VERSIONS: readonly number[] = [2, 3];
+/** Versoes que o importador ainda aceita (v2 = sem pre-registros, spec 022; v3 = sem preferencias, spec 032). */
+export const SUPPORTED_BACKUP_SCHEMA_VERSIONS: readonly number[] = [2, 3, 4, 5];
 
 /** Datas do backup viajam como string ISO (JSON nao tem tipo `Date`). */
 const dateStringSchema = z.iso.datetime({ offset: true }).or(z.iso.date());
@@ -261,6 +264,46 @@ const backupCaptureAttachmentRecordSchema = z.object({
   createdAt: dateStringSchema,
 });
 
+/**
+ * Preferencia do usuario no agente de IA (spec 032, backup v4). `lastUsedAt` nao viaja (e local ao
+ * aparelho). Vem **depois** de contas e categorias, porque o escopo as referencia.
+ */
+const backupPreferenceRecordSchema = z.object({
+  kind: z.literal('preference'),
+  id: z.string().trim().min(1),
+  userId: z.string().trim().min(1),
+  text: z.string().trim().min(1).max(200),
+  topic: z.string().trim().min(1),
+  scope: z.discriminatedUnion('kind', [
+    z.object({ kind: z.literal('global') }),
+    z.object({ kind: z.literal('account'), id: z.string().trim().min(1) }),
+    z.object({ kind: z.literal('category'), id: z.string().trim().min(1) }),
+  ]),
+  origin: z.enum(PREFERENCE_ORIGINS),
+  status: z.enum(PREFERENCE_STATUSES),
+  effect: z.enum(PREFERENCE_EFFECTS),
+  private: z.boolean(),
+  confidence: z.number().min(0).max(1),
+  evidence: z.int().min(0),
+  supersededBy: z.string().trim().min(1).nullable(),
+  createdAt: dateStringSchema,
+  updatedAt: dateStringSchema,
+});
+
+/** Regra de categorizacao do agente (spec 033, backup v5): comerciante normalizado -> categoria. Vem depois das categorias. */
+const backupCategorizationRuleRecordSchema = z.object({
+  kind: z.literal('categorizationRule'),
+  id: z.string().trim().min(1),
+  userId: z.string().trim().min(1),
+  merchant: z.string().trim().min(1).max(100),
+  categoryId: z.string().trim().min(1),
+  origin: z.enum(['learned', 'said']),
+  confidence: z.number().min(0).max(1),
+  evidence: z.int().min(0),
+  createdAt: dateStringSchema,
+  updatedAt: dateStringSchema,
+});
+
 export const backupRecordSchema = z.discriminatedUnion('kind', [
   backupHeaderRecordSchema,
   backupAccountRecordSchema,
@@ -274,6 +317,8 @@ export const backupRecordSchema = z.discriminatedUnion('kind', [
   backupPurchaseSimulationRecordSchema,
   backupPreRegistrationRecordSchema,
   backupCaptureAttachmentRecordSchema,
+  backupPreferenceRecordSchema,
+  backupCategorizationRuleRecordSchema,
 ]);
 
 export type BackupRecord = z.infer<typeof backupRecordSchema>;
@@ -289,3 +334,5 @@ export type BackupTransactionRecord = z.infer<typeof backupTransactionRecordSche
 export type BackupPurchaseSimulationRecord = z.infer<typeof backupPurchaseSimulationRecordSchema>;
 export type BackupPreRegistrationRecord = z.infer<typeof backupPreRegistrationRecordSchema>;
 export type BackupCaptureAttachmentRecord = z.infer<typeof backupCaptureAttachmentRecordSchema>;
+export type BackupPreferenceRecord = z.infer<typeof backupPreferenceRecordSchema>;
+export type BackupCategorizationRuleRecord = z.infer<typeof backupCategorizationRuleRecordSchema>;

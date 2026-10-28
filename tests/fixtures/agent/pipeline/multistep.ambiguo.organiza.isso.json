@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "turns": [
+    {
+      "events": [
+        {
+          "type": "text_delta",
+          "text": "O que você prefere organizar agora: classificar os lançamentos sem categoria, revisar os gastos fixos ou ver o resumo do mês?"
+        },
+        {
+          "type": "usage",
+          "inputTokens": 300,
+          "outputTokens": 40,
+          "costMicroUsd": 600
+        },
+        {
+          "type": "finish",
+          "reason": "stop"
+        }
+      ]
+    }
+  ]
+}

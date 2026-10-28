@@ -1,0 +1,6 @@
+data: {"choices":[{"delta":{"role":"assistant","tool_calls":[{"extra_content":{"google":{"thought_signature":"SIG-FIXTURE-0001"}},"function":{"arguments":"{\"echo\":\"ok\"}","name":"ping"},"id":"call_936490","type":"function"}]},"index":0}],"created":1792876892,"id":"WSHdapHgK5iwytMPvty86QM","model":"gemini-4-argon","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"role":"assistant"},"finish_reason":"stop","index":0}],"created":1792876892,"id":"WSHdapHgK5iwytMPvty86QM","model":"gemini-4-argon","object":"chat.completion.chunk"}
+
+data: [DONE]
+

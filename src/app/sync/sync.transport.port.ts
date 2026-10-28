@@ -8,6 +8,11 @@ export interface SyncHello {
   readonly protocolVersion: number;
   readonly hubId: string;
   readonly serverTime: string;
+  /**
+   * Versao do formato de backup do hub (spec 032): o celular so envia `preference` se for >= 4.
+   * Ausente = hub antigo.
+   */
+  readonly backupSchemaVersion?: number;
 }
 
 /**

@@ -1,0 +1,4 @@
+data: {"choices":[{"delta":{"role":"assistant","content":[{"type":"text","text":"Ola "},{"type":"text","text":"mundo"}]},"finish_reason":"stop"}]}
+
+data: [DONE]
+

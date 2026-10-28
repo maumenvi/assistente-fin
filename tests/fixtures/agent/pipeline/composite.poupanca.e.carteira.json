@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "turns": [
+    {
+      "events": [
+        {
+          "type": "tool_call",
+          "id": "call-1",
+          "name": "get_account_balances",
+          "args": {
+            "accountId": "acc-poupanca"
+          }
+        },
+        {
+          "type": "tool_call",
+          "id": "call-2",
+          "name": "get_account_balances",
+          "args": {
+            "accountId": "acc-carteira"
+          }
+        },
+        {
+          "type": "usage",
+          "inputTokens": 500,
+          "outputTokens": 30,
+          "costMicroUsd": 900
+        },
+        {
+          "type": "finish",
+          "reason": "tool_calls"
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "type": "text_delta",
+          "text": "Na poupança você tem R$ 0,00 e na carteira -R$ 16.501,34."
+        },
+        {
+          "type": "usage",
+          "inputTokens": 300,
+          "outputTokens": 40,
+          "costMicroUsd": 600
+        },
+        {
+          "type": "finish",
+          "reason": "stop"
+        }
+      ]
+    }
+  ]
+}

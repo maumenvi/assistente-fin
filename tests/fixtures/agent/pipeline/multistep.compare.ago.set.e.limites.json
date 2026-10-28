@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "turns": [
+    {
+      "events": [
+        {
+          "type": "tool_call",
+          "id": "call-1",
+          "name": "compare_periods",
+          "args": {
+            "a": "2026-08",
+            "b": "2026-09",
+            "groupBy": "category",
+            "kind": "expense"
+          }
+        },
+        {
+          "type": "tool_call",
+          "id": "call-2",
+          "name": "get_spending_limits",
+          "args": {
+            "month": "2026-10"
+          }
+        },
+        {
+          "type": "usage",
+          "inputTokens": 500,
+          "outputTokens": 30,
+          "costMicroUsd": 900
+        },
+        {
+          "type": "finish",
+          "reason": "tool_calls"
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "type": "text_delta",
+          "text": "Em agosto seus gastos foram R$ 8.033,17 e em setembro R$ 7.995,18. No limite de mercado em outubro ainda restam R$ 357,13."
+        },
+        {
+          "type": "usage",
+          "inputTokens": 300,
+          "outputTokens": 40,
+          "costMicroUsd": 600
+        },
+        {
+          "type": "finish",
+          "reason": "stop"
+        }
+      ]
+    }
+  ]
+}

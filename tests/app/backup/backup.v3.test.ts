@@ -43,7 +43,7 @@ test('backup v3 leva pre-registros e anexos de texto e volta igual (spec 022, T0
   );
   const records: BackupRecord[] = [];
   for await (const record of await new ExportBackupUseCase(source, new FixedClock(NOW)).execute({ userId: 'u1' })) records.push(record);
-  assert.equal(BACKUP_SCHEMA_VERSION, 3);
+  assert.equal(BACKUP_SCHEMA_VERSION, 5);
   assert.ok(records.some((r) => r.kind === 'preRegistration'));
   assert.ok(records.some((r) => r.kind === 'captureAttachment'));
 

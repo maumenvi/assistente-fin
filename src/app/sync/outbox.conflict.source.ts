@@ -15,12 +15,14 @@ const ENTITY_LABEL: Readonly<Record<SyncEntity, string>> = {
   purchaseSimulation: 'simulação',
   preRegistration: 'pré-registro',
   captureAttachment: 'anexo',
+  preference: 'preferência',
+  categorizationRule: 'regra de categorização',
 };
 
 /** Nome curto do registro para o sino ("conta Itau", "lançamento Mercado"). */
 export function describeConflictRecord(entity: SyncEntity, record: BackupRecord | null): string {
   const fields = (record ?? {}) as Record<string, unknown>;
-  const name = [fields['name'], fields['description'], fields['source'], fields['notes']].find(
+  const name = [fields['name'], fields['description'], fields['source'], fields['notes'], fields['text']].find(
     (value): value is string => typeof value === 'string' && value.trim() !== '',
   );
   return name === undefined ? ENTITY_LABEL[entity] : `${ENTITY_LABEL[entity]} ${name.slice(0, 40)}`;

@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "turns": [
+    {
+      "events": [
+        {
+          "type": "tool_call",
+          "id": "call-1",
+          "name": "calculate",
+          "args": {
+            "op": "pct_of",
+            "values": [
+              50000,
+              200000
+            ]
+          }
+        },
+        {
+          "type": "usage",
+          "inputTokens": 500,
+          "outputTokens": 30,
+          "costMicroUsd": 900
+        },
+        {
+          "type": "finish",
+          "reason": "tool_calls"
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "type": "text_delta",
+          "text": "R$ 500,00 corresponde a 25% de R$ 2.000,00."
+        },
+        {
+          "type": "usage",
+          "inputTokens": 300,
+          "outputTokens": 40,
+          "costMicroUsd": 600
+        },
+        {
+          "type": "finish",
+          "reason": "stop"
+        }
+      ]
+    }
+  ]
+}

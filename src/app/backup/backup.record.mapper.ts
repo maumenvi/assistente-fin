@@ -13,6 +13,9 @@ import { Recurrence } from '../../domain/shared/recurrence.value.object.ts';
 import { Month } from '../../domain/shared/month.value.object.ts';
 import { Category } from '../../domain/category/category.entity.ts';
 import { CategoryName } from '../../domain/category/category.name.value.object.ts';
+import { type Preference } from '../../domain/preference/preference.ts';
+import { type CategorizationRule } from '../../domain/plan/rule/categorization.rule.ts';
+import { type PreferenceTopic } from '../../domain/preference/preference.topic.ts';
 import {
   type BackupAccountRecord,
   type BackupCategoryRecord,
@@ -25,6 +28,8 @@ import {
   type BackupPurchaseSimulationRecord,
   type BackupPreRegistrationRecord,
   type BackupCaptureAttachmentRecord,
+  type BackupPreferenceRecord,
+  type BackupCategorizationRuleRecord,
 } from '../shared/backup.record.schema.ts';
 
 /**
@@ -441,4 +446,69 @@ export function fromCaptureAttachmentRecord(record: BackupCaptureAttachmentRecor
     sha256: record.sha256,
     createdAt: new Date(record.createdAt),
   });
+}
+
+/** Preferencia -> record (spec 032, backup v4). `lastUsedAt` e a origem ficam locais, fora do record. */
+export function toPreferenceRecord(p: Preference): BackupPreferenceRecord {
+  return {
+    kind: 'preference',
+    id: p.id,
+    userId: p.userId,
+    text: p.text,
+    topic: p.topic,
+    scope: p.scope,
+    origin: p.origin,
+    status: p.status,
+    effect: p.effect,
+    private: p.private,
+    confidence: p.confidence,
+    evidence: p.evidence,
+    supersededBy: p.supersededBy,
+    createdAt: p.createdAt,
+    updatedAt: p.updatedAt,
+  };
+}
+
+/** Record -> preferencia (spec 032). Campos locais nascem vazios; quem grava preserva os do aparelho. */
+export function fromPreferenceRecord(record: BackupPreferenceRecord): Preference {
+  return {
+    id: record.id,
+    userId: record.userId,
+    text: record.text,
+    topic: record.topic as PreferenceTopic,
+    scope: record.scope,
+    origin: record.origin,
+    status: record.status,
+    effect: record.effect,
+    private: record.private,
+    confidence: record.confidence,
+    evidence: record.evidence,
+    supersededBy: record.supersededBy,
+    createdAt: new Date(record.createdAt).toISOString(),
+    updatedAt: new Date(record.updatedAt).toISOString(),
+    lastUsedAt: null,
+    sourceConversationId: null,
+    sourceMessageId: null,
+    sourceMessageRemoved: false,
+  };
+}
+
+/** Regra de categorizacao -> record (spec 033, backup v5). */
+export function toCategorizationRuleRecord(r: CategorizationRule): BackupCategorizationRuleRecord {
+  return { kind: 'categorizationRule', id: r.id, userId: r.userId, merchant: r.merchant, categoryId: r.categoryId, origin: r.origin, confidence: r.confidence, evidence: r.evidence, createdAt: r.createdAt, updatedAt: r.updatedAt };
+}
+
+/** Record -> regra de categorizacao (spec 033). */
+export function fromCategorizationRuleRecord(record: BackupCategorizationRuleRecord): CategorizationRule {
+  return {
+    id: record.id,
+    userId: record.userId,
+    merchant: record.merchant,
+    categoryId: record.categoryId,
+    origin: record.origin,
+    confidence: record.confidence,
+    evidence: record.evidence,
+    createdAt: new Date(record.createdAt).toISOString(),
+    updatedAt: new Date(record.updatedAt).toISOString(),
+  };
 }

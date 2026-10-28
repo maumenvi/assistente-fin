@@ -192,6 +192,8 @@ test('roundtrip export->import: restaura tudo no destino, com o mesmo conteudo (
     purchaseSimulations: 1,
     preRegistrations: 0,
     captureAttachments: 0,
+    preferences: 0,
+    rules: 0,
   });
 
   const restoredSeries = await target.transactionSeries.findById('u1', 'series-1');

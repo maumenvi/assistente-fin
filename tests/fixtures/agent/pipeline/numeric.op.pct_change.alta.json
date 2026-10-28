@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "turns": [
+    {
+      "events": [
+        {
+          "type": "tool_call",
+          "id": "call-1",
+          "name": "calculate",
+          "args": {
+            "op": "pct_change",
+            "values": [
+              100000,
+              125000
+            ]
+          }
+        },
+        {
+          "type": "usage",
+          "inputTokens": 500,
+          "outputTokens": 30,
+          "costMicroUsd": 900
+        },
+        {
+          "type": "finish",
+          "reason": "tool_calls"
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "type": "text_delta",
+          "text": "A variação de R$ 1.000,00 para R$ 1.250,00 é de 25%."
+        },
+        {
+          "type": "usage",
+          "inputTokens": 300,
+          "outputTokens": 40,
+          "costMicroUsd": 600
+        },
+        {
+          "type": "finish",
+          "reason": "stop"
+        }
+      ]
+    }
+  ]
+}

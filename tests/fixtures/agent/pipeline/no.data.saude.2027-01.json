@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "turns": [
+    {
+      "events": [
+        {
+          "type": "tool_call",
+          "id": "call-1",
+          "name": "query_transactions",
+          "args": {
+            "from": "2027-01-01",
+            "to": "2027-01-31",
+            "category": "Saúde"
+          }
+        },
+        {
+          "type": "usage",
+          "inputTokens": 500,
+          "outputTokens": 30,
+          "costMicroUsd": 900
+        },
+        {
+          "type": "finish",
+          "reason": "tool_calls"
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "type": "text_delta",
+          "text": "Não encontrei lançamentos nesse período."
+        },
+        {
+          "type": "usage",
+          "inputTokens": 300,
+          "outputTokens": 40,
+          "costMicroUsd": 600
+        },
+        {
+          "type": "finish",
+          "reason": "stop"
+        }
+      ]
+    }
+  ]
+}

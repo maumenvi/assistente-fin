@@ -52,6 +52,6 @@ export class ExportBackupUseCase {
       throw new UserNotFoundError();
     }
 
-    return streamBackupRecords(this.database, userId, this.clock.now());
+    return streamBackupRecords(this.database, userId, this.clock.now(), { preferences: true, rules: true });
   }
 }

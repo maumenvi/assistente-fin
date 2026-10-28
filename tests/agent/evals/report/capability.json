@@ -1,0 +1,11 @@
+{
+  "suite": "capability",
+  "total": 10,
+  "rightCards": 10,
+  "rightCardRate": 1,
+  "connectedWithoutApproval": 0,
+  "fabricatedCandidates": 0,
+  "violations": [],
+  "failures": [],
+  "ok": true
+}

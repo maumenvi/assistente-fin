@@ -1,7 +1,7 @@
 {
   "name": "assistente-fin",
   "license": "SEE LICENSE IN LICENSE",
-  "version": "1.0.18",
+  "version": "1.0.40",
   "description": "Aplicativo de controle financeiro pessoal para desktop e celular.",
   "scripts": {
     "test": "node --test --test-concurrency=1",
@@ -48,7 +48,9 @@
     "@radix-ui/react-popover": "^1.1.23",
     "@radix-ui/react-select": "^2.3.7",
     "fastify": "5.12.4",
+    "fflate": "^0.8.3",
     "nodemailer": "^10.0.1",
+    "pdfjs-dist": "4.10.38",
     "pg": "^8.16.3",
     "zod": "^4.5.4"
   },

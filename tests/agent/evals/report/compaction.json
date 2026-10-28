@@ -1,0 +1,10 @@
+{
+  "suite": "compaction",
+  "total": 12,
+  "passed": 12,
+  "fidelity": 1,
+  "valueLeaks": 0,
+  "violations": [],
+  "failures": [],
+  "ok": true
+}

@@ -11,6 +11,11 @@ import { type SyncTransport } from './sync.transport.port.ts';
 import { type SyncCycleReport } from './sync.cycle.report.ts';
 import { type SyncChange } from './sync.change.ts';
 import { SyncProtocolError } from './sync.protocol.error.ts';
+import { reconcilePreferences } from '../agent/preference/reconcile.preferences.ts';
+import { makePreferenceOverwrite } from './make.preference.overwrite.ts';
+import { type BackupRecord } from '../shared/backup.record.schema.ts';
+import { type SyncEntity } from './sync.entity.ts';
+import { unsupportedEntities } from './unsupported.entities.ts';
 
 const PUSH_BATCH = 200;
 const PULL_PAGE = 500;
@@ -58,8 +63,9 @@ export class SyncEngine {
     try {
       const hello = await this.transport.hello();
       if (hello.protocolVersion !== SYNC_PROTOCOL_VERSION) throw new SyncProtocolError(hello.protocolVersion);
-      const pushed = await this.pushAll(userId);
+      const pushed = await this.pushAll(userId, unsupportedEntities(hello));
       const pulled = await this.pullAll(userId);
+      await reconcilePreferences(this.replica.database.preferences, userId, this.clock.now());
       await outbox.setLastSuccessAt(this.clock.now());
       await outbox.setLastError(null);
       return { ...pushed, pulled };
@@ -69,13 +75,13 @@ export class SyncEngine {
     }
   }
 
-  private async pushAll(userId: string): Promise<Omit<SyncCycleReport, 'pulled'>> {
+  private async pushAll(userId: string, exclude: readonly SyncEntity[]): Promise<Omit<SyncCycleReport, 'pulled'>> {
     const outbox = this.replica.outbox;
     let pushed = 0;
     let conflicts = 0;
     const rejected: { entity: string; entityId: string; message: string }[] = [];
     for (let round = 0; round < MAX_ROUNDS; round += 1) {
-      const entries = await outbox.pending(PUSH_BATCH);
+      const entries = await outbox.pending(PUSH_BATCH, exclude);
       if (entries.length === 0) break;
       const ops = await this.buildOps(userId, entries);
       await outbox.markAttempted(entries.map((entry) => entry.opId));
@@ -129,6 +135,10 @@ export class SyncEngine {
       });
       return { message: result.message };
     }
+    if (result.status === 'superseded') {
+      await this.applySuperseded(tx, op, result.remote);
+      return 'pushed';
+    }
     if (result.status === 'conflict') {
       await tx.outbox.saveConflict({
         id: this.ids.next(),
@@ -144,6 +154,28 @@ export class SyncEngine {
     }
     await tx.outbox.setBaseVersion(op.entity, op.entityId, result.version);
     return 'pushed';
+  }
+
+  /**
+   * "Ultima escrita vence" (spec 032): a versao do celular perdeu. Aplica a que valeu ja, sem
+   * esperar o pull (o cursor pode ja ter passado dela), e guarda o texto perdido para o aviso.
+   */
+  private async applySuperseded(tx: SyncReplica, op: SyncOp, remote: { readonly record: BackupRecord | null; readonly version: string | null }): Promise<void> {
+    const codec = SYNC_CODECS[op.entity];
+    await tx.applyingPull(async (inner) => {
+      if (remote.record === null) {
+        await inner.forceDelete(op.entity, op.entityId);
+        await inner.outbox.setBaseVersion(op.entity, op.entityId, null);
+      } else {
+        await codec.save(inner.database, codec.fromRecord(remote.record));
+        await inner.outbox.setBaseVersion(op.entity, op.entityId, remote.version);
+      }
+      if (op.record?.kind === 'preference') {
+        const keptText = remote.record?.kind === 'preference' ? remote.record.text : null;
+        const overwrite = makePreferenceOverwrite({ userId: op.record.userId, preferenceId: op.record.id, lostText: op.record.text, lostAt: op.record.updatedAt, keptText });
+        if (overwrite !== null) await inner.database.preferences.overwrites.record(overwrite);
+      }
+    });
   }
 
   private async pullAll(userId: string): Promise<number> {

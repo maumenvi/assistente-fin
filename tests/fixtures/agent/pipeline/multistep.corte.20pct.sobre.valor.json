@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "turns": [
+    {
+      "events": [
+        {
+          "type": "tool_call",
+          "id": "call-1",
+          "name": "get_account_balances",
+          "args": {
+            "accountId": "acc-carteira"
+          }
+        },
+        {
+          "type": "tool_call",
+          "id": "call-2",
+          "name": "calculate",
+          "args": {
+            "op": "expr",
+            "expression": "(1500 * 20%) * 3"
+          }
+        },
+        {
+          "type": "usage",
+          "inputTokens": 500,
+          "outputTokens": 30,
+          "costMicroUsd": 900
+        },
+        {
+          "type": "finish",
+          "reason": "tool_calls"
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "type": "text_delta",
+          "text": "Na carteira você tem -R$ 16.501,34, e 20% de R$ 1.500,00 em 3 meses soma R$ 900,00."
+        },
+        {
+          "type": "usage",
+          "inputTokens": 300,
+          "outputTokens": 40,
+          "costMicroUsd": 600
+        },
+        {
+          "type": "finish",
+          "reason": "stop"
+        }
+      ]
+    }
+  ]
+}

@@ -26,7 +26,7 @@ test('as instrucoes cobrem os itens (a) a (h) da spec 029 (FR-020)', () => {
     ['(e) batchId e ref unicos', /batchId[\s\S]*ref" unico/],
     ['(f) confirm so quando eu pedir', /"confirm": true[\s\S]*so use quando eu pedir/],
     ['(g) perguntar em caso de duvida', /pergunte a mim/],
-    ['(h) avisar para copiar e abrir o app', /copia-lo e abrir o app Finance Controller/],
+    ['(h) avisar para copiar e abrir o app', /copia-lo e abrir o app Assistente Fin/],
     ['valor TOTAL da compra parcelada', /valor TOTAL da compra/],
     ['snapshotId devolvido', /snapshotId/],
   ];

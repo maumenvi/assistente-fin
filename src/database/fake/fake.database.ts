@@ -1,3 +1,11 @@
+import { type AgentStorePort } from '../../app/agent/ports/store/agent.store.port.ts';
+import { type CapabilityStoresPort } from '../../app/agent/capability/ports/capability.stores.port.ts';
+import { type PlanStoresPort } from '../../app/agent/plan/ports/plan.stores.port.ts';
+import { type PreferenceStoresPort } from '../../app/agent/ports/preference/preference.stores.port.ts';
+import { FakeAgentStore } from './agent.store.fake.ts';
+import { FakeCapabilityStores } from './capability.stores.fake.ts';
+import { FakePlanStores } from './plan.stores.fake.ts';
+import { FakePreferenceStores } from './preference.stores.fake.ts';
 import { type PreRegistrationRepository } from '../../app/pre-registration/pre.registration.repository.port.ts';
 import { type CaptureAttachmentRepository } from '../../app/pre-registration/capture.attachment.repository.port.ts';
 import { FakeCaptureReceiptRepository } from './capture.receipt.repository.fake.ts';
@@ -71,6 +79,10 @@ export class FakeDatabase implements Database {
   public readonly userNotifications: UserNotificationRepository;
   public readonly captureReceipts: CaptureReceiptRepository;
   public readonly preRegistrationOutcomes: PreRegistrationOutcomeRepository;
+  public readonly agent: AgentStorePort;
+  public readonly preferences: PreferenceStoresPort;
+  public readonly plans: PlanStoresPort;
+  public readonly capabilities: CapabilityStoresPort;
 
   public constructor() {
     this.accounts = new FakeAccountRepository();
@@ -94,6 +106,10 @@ export class FakeDatabase implements Database {
     this.userNotifications = new FakeUserNotificationRepository();
     this.captureReceipts = new FakeCaptureReceiptRepository();
     this.preRegistrationOutcomes = new FakePreRegistrationOutcomeRepository();
+    this.agent = new FakeAgentStore();
+    this.preferences = new FakePreferenceStores();
+    this.plans = new FakePlanStores();
+    this.capabilities = new FakeCapabilityStores();
   }
 
   public async transaction<T>(work: (tx: Database) => Promise<T>): Promise<T> {

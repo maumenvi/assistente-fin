@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "turns": [
+    {
+      "events": [
+        {
+          "type": "tool_call",
+          "id": "call-1",
+          "name": "get_credit_card_status",
+          "args": {
+            "accountId": "card-nubank"
+          }
+        },
+        {
+          "type": "tool_call",
+          "id": "call-2",
+          "name": "get_spending_limits",
+          "args": {
+            "month": "2026-10"
+          }
+        },
+        {
+          "type": "usage",
+          "inputTokens": 500,
+          "outputTokens": 30,
+          "costMicroUsd": 900
+        },
+        {
+          "type": "finish",
+          "reason": "tool_calls"
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "type": "text_delta",
+          "text": "O limite disponível do Nubank é R$ 5.372,42 e você gastou R$ 807,78 no limite de lazer em outubro."
+        },
+        {
+          "type": "usage",
+          "inputTokens": 300,
+          "outputTokens": 40,
+          "costMicroUsd": 600
+        },
+        {
+          "type": "finish",
+          "reason": "stop"
+        }
+      ]
+    }
+  ]
+}

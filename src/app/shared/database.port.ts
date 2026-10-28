@@ -1,3 +1,7 @@
+import { type CapabilityStoresPort } from '../agent/capability/ports/capability.stores.port.ts';
+import { type PlanStoresPort } from '../agent/plan/ports/plan.stores.port.ts';
+import { type PreferenceStoresPort } from '../agent/ports/preference/preference.stores.port.ts';
+import { type AgentStorePort } from '../agent/ports/store/agent.store.port.ts';
 import { type PreRegistrationRepository } from '../pre-registration/pre.registration.repository.port.ts';
 import { type CaptureAttachmentRepository } from '../pre-registration/capture.attachment.repository.port.ts';
 import { type AccountRepository } from '../account/account.repository.port.ts';
@@ -94,6 +98,18 @@ export interface Database {
 
   /** Destino de pre-registros removidos (spec 027, R6). */
   readonly preRegistrationOutcomes: PreRegistrationOutcomeRepository;
+
+  /** Conversas, mensagens, execucoes e passos do agente de IA; locais do aparelho (spec 031). */
+  readonly agent: AgentStorePort;
+
+  /** Preferencias do usuario, sinais de aprendizado e recusas (spec 032); so `preferences` sincroniza. */
+  readonly preferences: PreferenceStoresPort;
+
+  /** Planos, politica de autonomia, regras de categorizacao e evidencias (spec 033); so `rules` sincroniza. */
+  readonly plans: PlanStoresPort;
+
+  /** Capacidades dinamicas do agente (spec 034): locais ao aparelho e ao usuario, sem sync nem backup. */
+  readonly capabilities: CapabilityStoresPort;
 
   /**
    * Executa `work` como unidade de trabalho: no adaptador `fake` roda direto, no `prisma`

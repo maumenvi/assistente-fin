@@ -1,0 +1,238 @@
+{
+  "model": "openrouter/auto",
+  "total": 12,
+  "passed": 0,
+  "exactness": 0,
+  "inventedFigures": 0,
+  "improperWrites": 0,
+  "costMicroUsd": null,
+  "totalMs": 47993.30388,
+  "byCategory": {
+    "composite": {
+      "total": 12,
+      "passed": 0
+    }
+  },
+  "failures": [
+    {
+      "id": "composite.resumo.2026-09",
+      "category": "composite",
+      "exact": false,
+      "invented": [],
+      "trajectoryOk": false,
+      "forbiddenHit": false,
+      "improperWrite": false,
+      "behaviorOk": true,
+      "passed": false,
+      "costMicroUsd": null,
+      "ms": 3931.8928539999997,
+      "excerpt": "",
+      "reasons": [
+        "execução falhou (LLM_QUOTA)",
+        "trajetória: esperado [get_month_summary], chamado []"
+      ]
+    },
+    {
+      "id": "composite.resumo.2026-08",
+      "category": "composite",
+      "exact": false,
+      "invented": [],
+      "trajectoryOk": false,
+      "forbiddenHit": false,
+      "improperWrite": false,
+      "behaviorOk": true,
+      "passed": false,
+      "costMicroUsd": null,
+      "ms": 1785.6925069999998,
+      "excerpt": "",
+      "reasons": [
+        "execução falhou (LLM_QUOTA)",
+        "trajetória: esperado [get_month_summary], chamado []"
+      ]
+    },
+    {
+      "id": "composite.resumo.2026-07",
+      "category": "composite",
+      "exact": false,
+      "invented": [],
+      "trajectoryOk": false,
+      "forbiddenHit": false,
+      "improperWrite": false,
+      "behaviorOk": true,
+      "passed": false,
+      "costMicroUsd": null,
+      "ms": 1874.8893230000003,
+      "excerpt": "",
+      "reasons": [
+        "execução falhou (LLM_QUOTA)",
+        "trajetória: esperado [get_month_summary], chamado []"
+      ]
+    },
+    {
+      "id": "composite.resumo.2026-10",
+      "category": "composite",
+      "exact": false,
+      "invented": [],
+      "trajectoryOk": false,
+      "forbiddenHit": false,
+      "improperWrite": false,
+      "behaviorOk": true,
+      "passed": false,
+      "costMicroUsd": null,
+      "ms": 1968.4188320000003,
+      "excerpt": "",
+      "reasons": [
+        "execução falhou (LLM_QUOTA)",
+        "trajetória: esperado [get_month_summary], chamado []"
+      ]
+    },
+    {
+      "id": "composite.duas.categorias.2026-09.mercado.lazer",
+      "category": "composite",
+      "exact": false,
+      "invented": [],
+      "trajectoryOk": false,
+      "forbiddenHit": false,
+      "improperWrite": false,
+      "behaviorOk": true,
+      "passed": false,
+      "costMicroUsd": null,
+      "ms": 1680.382928000001,
+      "excerpt": "",
+      "reasons": [
+        "execução falhou (LLM_QUOTA)",
+        "trajetória: esperado [query_transactions], chamado []"
+      ]
+    },
+    {
+      "id": "composite.duas.categorias.2026-08.transporte.sade",
+      "category": "composite",
+      "exact": false,
+      "invented": [],
+      "trajectoryOk": false,
+      "forbiddenHit": false,
+      "improperWrite": false,
+      "behaviorOk": true,
+      "passed": false,
+      "costMicroUsd": 169,
+      "ms": 13350.675505,
+      "excerpt": "## Comparação não disponível\n\nPeríodo consultado: **08/2026**.\n\nNão encontrei valores de **transporte** nem de **saúde** — nenhum valor foi apurado ainda. Sem e",
+      "reasons": [
+        "faltam valores esperados: R$ 519,27, R$ 1.653,39",
+        "trajetória: esperado [query_transactions], chamado []"
+      ]
+    },
+    {
+      "id": "composite.duas.categorias.2026-07.mercado.restaurantes",
+      "category": "composite",
+      "exact": false,
+      "invented": [],
+      "trajectoryOk": false,
+      "forbiddenHit": false,
+      "improperWrite": false,
+      "behaviorOk": true,
+      "passed": false,
+      "costMicroUsd": null,
+      "ms": 1869.7080449999994,
+      "excerpt": "",
+      "reasons": [
+        "execução falhou (LLM_QUOTA)",
+        "trajetória: esperado [query_transactions], chamado []"
+      ]
+    },
+    {
+      "id": "composite.saldo.e.limite",
+      "category": "composite",
+      "exact": false,
+      "invented": [],
+      "trajectoryOk": false,
+      "forbiddenHit": false,
+      "improperWrite": false,
+      "behaviorOk": true,
+      "passed": false,
+      "costMicroUsd": 46,
+      "ms": 7068.483273000002,
+      "excerpt": "Não consigo ver seus dados agora: esta versão do assistente não tem acesso às ferramentas do app, então não posso consultar saldo de conta nem limite de categor",
+      "reasons": [
+        "faltam valores esperados: R$ 60.320,38, R$ 357,13",
+        "trajetória: esperado [get_account_balances, get_spending_limits], chamado []"
+      ]
+    },
+    {
+      "id": "composite.poupanca.e.carteira",
+      "category": "composite",
+      "exact": false,
+      "invented": [],
+      "trajectoryOk": false,
+      "forbiddenHit": false,
+      "improperWrite": false,
+      "behaviorOk": true,
+      "passed": false,
+      "costMicroUsd": null,
+      "ms": 1554.9489160000012,
+      "excerpt": "",
+      "reasons": [
+        "execução falhou (LLM_QUOTA)",
+        "trajetória: esperado [get_account_balances], chamado []"
+      ]
+    },
+    {
+      "id": "composite.gastos.e.ganhos.setembro",
+      "category": "composite",
+      "exact": false,
+      "invented": [],
+      "trajectoryOk": false,
+      "forbiddenHit": false,
+      "improperWrite": false,
+      "behaviorOk": true,
+      "passed": false,
+      "costMicroUsd": null,
+      "ms": 2081.789423000002,
+      "excerpt": "",
+      "reasons": [
+        "execução falhou (LLM_QUOTA)",
+        "trajetória: esperado [query_transactions], chamado []"
+      ]
+    },
+    {
+      "id": "composite.restaurantes.lazer.outubro",
+      "category": "composite",
+      "exact": false,
+      "invented": [],
+      "trajectoryOk": false,
+      "forbiddenHit": false,
+      "improperWrite": false,
+      "behaviorOk": true,
+      "passed": false,
+      "costMicroUsd": 63,
+      "ms": 9077.739597999993,
+      "excerpt": "",
+      "reasons": [
+        "execução falhou (LLM_QUOTA)",
+        "trajetória: esperado [query_transactions, get_spending_limits], chamado []"
+      ]
+    },
+    {
+      "id": "composite.saldo.e.fatura",
+      "category": "composite",
+      "exact": false,
+      "invented": [],
+      "trajectoryOk": false,
+      "forbiddenHit": false,
+      "improperWrite": false,
+      "behaviorOk": true,
+      "passed": false,
+      "costMicroUsd": null,
+      "ms": 1748.6826759999967,
+      "excerpt": "",
+      "reasons": [
+        "execução falhou (LLM_QUOTA)",
+        "trajetória: esperado [get_account_balances, get_credit_card_status], chamado []"
+      ]
+    }
+  ],
+  "violations": [
+    "exatidão 0.0% abaixo de 95%"
+  ],
+  "ok": false
+}

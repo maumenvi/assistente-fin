@@ -1,0 +1,10 @@
+: OPENROUTER PROCESSING
+
+data: {"id":"gen-1","provider":"X","model":"openrouter/auto","object":"chat.completion.chunk","created":1,"choices":[{"index":0,"delta":{"role":"assistant","content":"Ola","reasoning":null},"finish_reason":null,"native_finish_reason":null,"logprobs":null}]}
+
+data: {"id":"gen-1","provider":"X","model":"openrouter/auto","object":"chat.completion.chunk","created":1,"choices":[{"index":0,"delta":{"role":"assistant","content":" mundo","reasoning":"pensando","reasoning_details":[{"type":"reasoning.text","text":"pensando"}]},"finish_reason":"stop","native_finish_reason":"STOP"}]}
+
+data: {"id":"gen-1","object":"chat.completion.chunk","created":1,"model":"openrouter/auto","provider":"X","choices":[],"usage":{"prompt_tokens":10,"completion_tokens":4,"total_tokens":14,"cost":0.0001,"prompt_tokens_details":{"cached_tokens":0}}}
+
+data: [DONE]
+

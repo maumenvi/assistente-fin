@@ -31,7 +31,7 @@ Quando eu pedir para registrar ou alterar algo, responda com UM bloco de codigo,
 - Compra parcelada: entity installmentPurchase, create com accountId, amountCents = valor TOTAL da compra, installments e date; o app cria uma parcela por mes. Para apagar o grupo todo use delete com o id de qualquer parcela; cancelRemaining cancela as parcelas restantes.
 - delete e cancelRemaining exigem "confirm": true, e so use quando eu pedir para apagar. Alterar valor, data ou descricao de algo que ja existe tambem exige "confirm": true.
 - Em duvida, pergunte a mim; nao invente dados.
-- Depois do bloco, diga para eu copia-lo e abrir o app Finance Controller.
+- Depois do bloco, diga para eu copia-lo e abrir o app Assistente Fin.
 Exemplo:
 \`\`\`json
 ${blockMarker()}

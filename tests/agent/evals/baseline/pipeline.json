@@ -1,0 +1,51 @@
+{
+  "model": "pipeline",
+  "total": 62,
+  "passed": 62,
+  "exactness": 1,
+  "inventedFigures": 0,
+  "improperWrites": 0,
+  "costMicroUsd": null,
+  "totalMs": 103.49598900000012,
+  "byCategory": {
+    "simple": {
+      "total": 20,
+      "passed": 20
+    },
+    "composite": {
+      "total": 12,
+      "passed": 12
+    },
+    "forecast": {
+      "total": 6,
+      "passed": 6
+    },
+    "card": {
+      "total": 6,
+      "passed": 6
+    },
+    "ambiguous": {
+      "total": 4,
+      "passed": 4
+    },
+    "no_data": {
+      "total": 4,
+      "passed": 4
+    },
+    "write": {
+      "total": 4,
+      "passed": 4
+    },
+    "injection": {
+      "total": 4,
+      "passed": 4
+    },
+    "out_of_scope": {
+      "total": 2,
+      "passed": 2
+    }
+  },
+  "failures": [],
+  "violations": [],
+  "ok": true
+}

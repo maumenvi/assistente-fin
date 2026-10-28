@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "turns": [
+    {
+      "events": [
+        {
+          "type": "tool_call",
+          "id": "call-1",
+          "name": "query_transactions",
+          "args": {
+            "from": "2026-10-01",
+            "to": "2026-10-31",
+            "category": "Restaurantes"
+          }
+        },
+        {
+          "type": "tool_call",
+          "id": "call-2",
+          "name": "get_spending_limits",
+          "args": {
+            "month": "2026-10"
+          }
+        },
+        {
+          "type": "usage",
+          "inputTokens": 500,
+          "outputTokens": 30,
+          "costMicroUsd": 900
+        },
+        {
+          "type": "finish",
+          "reason": "tool_calls"
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "type": "text_delta",
+          "text": "Com restaurantes você gastou R$ 509,69 neste mês, 85% do limite."
+        },
+        {
+          "type": "usage",
+          "inputTokens": 300,
+          "outputTokens": 40,
+          "costMicroUsd": 600
+        },
+        {
+          "type": "finish",
+          "reason": "stop"
+        }
+      ]
+    }
+  ]
+}

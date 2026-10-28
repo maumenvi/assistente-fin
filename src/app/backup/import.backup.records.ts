@@ -13,6 +13,8 @@ import {
   fromPurchaseSimulationRecord,
   fromPreRegistrationRecord,
   fromCaptureAttachmentRecord,
+  fromPreferenceRecord,
+  fromCategorizationRuleRecord,
 } from './backup.record.mapper.ts';
 
 /** Quantos registros de cada tipo foram gravados (RF-18, CA-16). */
@@ -28,6 +30,8 @@ export interface ImportReport {
   readonly purchaseSimulations: number;
   readonly preRegistrations: number;
   readonly captureAttachments: number;
+  readonly preferences: number;
+  readonly rules: number;
 }
 
 /**
@@ -143,6 +147,23 @@ export async function saveBackupRecord(tx: Database, record: Exclude<BackupRecor
     case 'captureAttachment':
       await tx.captureAttachments.save(fromCaptureAttachmentRecord(record));
       return 'captureAttachments';
+    case 'preference': {
+      // spec 032: escopo cuja conta/categoria nao existe aqui cai para global e PRIVADA (nunca amplia a exposicao)
+      const preference = fromPreferenceRecord(record);
+      const scope = preference.scope;
+      const known =
+        scope.kind === 'global' ||
+        (scope.kind === 'account' ? (await tx.accounts.findById(preference.userId, scope.id)) !== null : (await tx.categories.findById(preference.userId, scope.id)) !== null);
+      await tx.preferences.preferences.save(known ? preference : { ...preference, scope: { kind: 'global' }, private: true });
+      return 'preferences';
+    }
+    case 'categorizationRule': {
+      // spec 033: regra cuja categoria nao existe aqui nao tem o que apontar; e ignorada
+      const rule = fromCategorizationRuleRecord(record);
+      if ((await tx.categories.findById(rule.userId, rule.categoryId)) === null) return 'rules';
+      await tx.plans.rules.save(rule);
+      return 'rules';
+    }
   }
 }
 
@@ -160,6 +181,8 @@ export function emptyImportReport(): { -readonly [K in keyof ImportReport]: numb
     purchaseSimulations: 0,
     preRegistrations: 0,
     captureAttachments: 0,
+    preferences: 0,
+    rules: 0,
   };
 }
 

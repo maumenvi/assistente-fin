@@ -173,7 +173,7 @@ test('gera header seguido de um record por entidade, na ordem categories->accoun
   );
   const header = records[0]!;
   if (header.kind !== 'header') throw new Error('esperava header');
-  assert.equal(header.schemaVersion, 3); // v3: pre-registros (spec 022)
+  assert.equal(header.schemaVersion, 5); // v5: regras de categorizacao (spec 033); v4: preferencias (spec 032)
   assert.equal(header.userId, 'u1');
   assert.equal(header.exportedAt, '2026-02-01T00:00:00.000Z');
 });

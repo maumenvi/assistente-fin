@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "turns": [
+    {
+      "events": [
+        {
+          "type": "tool_call",
+          "id": "call-1",
+          "name": "propose_changes",
+          "args": {
+            "summary": "Transferir R$ 200,00 da Poupança para o Itaú",
+            "operations": [
+              {
+                "kind": "transfer.create",
+                "fromAccountId": "acc-poupanca",
+                "toAccountId": "acc-itau",
+                "amountCents": 20000,
+                "date": "2026-10-15"
+              }
+            ]
+          }
+        },
+        {
+          "type": "usage",
+          "inputTokens": 500,
+          "outputTokens": 30,
+          "costMicroUsd": 900
+        },
+        {
+          "type": "finish",
+          "reason": "tool_calls"
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "type": "text_delta",
+          "text": "Montei o plano da transferência de R$ 200,00 da Poupança para o Itaú. Ela só acontece depois da sua aprovação."
+        },
+        {
+          "type": "usage",
+          "inputTokens": 300,
+          "outputTokens": 40,
+          "costMicroUsd": 600
+        },
+        {
+          "type": "finish",
+          "reason": "stop"
+        }
+      ]
+    }
+  ]
+}

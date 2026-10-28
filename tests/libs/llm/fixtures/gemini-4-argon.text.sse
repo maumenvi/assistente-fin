@@ -1,0 +1,6 @@
+data: {"choices":[{"delta":{"content":"ok","role":"assistant"},"index":0}],"created":1792876871,"id":"RSHdarjSBKaM1sgP4tnmsAs","model":"gemini-4-argon","object":"chat.completion.chunk"}
+
+data: {"choices":[{"delta":{"extra_content":{"google":{"thought_signature":"SIG-FIXTURE-0002"}},"role":"assistant"},"finish_reason":"stop","index":0}],"created":1792876871,"id":"RSHdarjSBKaM1sgP4tnmsAs","model":"gemini-4-argon","object":"chat.completion.chunk"}
+
+data: [DONE]
+

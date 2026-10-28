@@ -21,7 +21,7 @@ export function buildVerificationMessage(
   return {
     subject: `Codigo de verificacao: ${code}`,
     body:
-      `Seu codigo para verificar o ${alvo} no Finance Controller e ${code}.\n\n` +
+      `Seu codigo para verificar o ${alvo} no Assistente Fin e ${code}.\n\n` +
       `Ele vale por ${TTL_MINUTES} minutos. Se voce nao pediu este codigo, ignore esta mensagem.`,
   };
 }

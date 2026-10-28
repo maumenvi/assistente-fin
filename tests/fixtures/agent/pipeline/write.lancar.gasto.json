@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "turns": [
+    {
+      "events": [
+        {
+          "type": "tool_call",
+          "id": "call-1",
+          "name": "propose_changes",
+          "args": {
+            "summary": "Lançar 1 despesa de R$ 50,00",
+            "operations": [
+              {
+                "kind": "transaction.create",
+                "date": "2026-10-15",
+                "amountCents": 5000,
+                "type": "expense",
+                "accountId": "acc-itau",
+                "categoryName": "Mercado"
+              }
+            ]
+          }
+        },
+        {
+          "type": "usage",
+          "inputTokens": 500,
+          "outputTokens": 30,
+          "costMicroUsd": 900
+        },
+        {
+          "type": "finish",
+          "reason": "tool_calls"
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "type": "text_delta",
+          "text": "Montei o plano com a despesa de R$ 50,00 no mercado. Ela só é gravada depois da sua aprovação."
+        },
+        {
+          "type": "usage",
+          "inputTokens": 300,
+          "outputTokens": 40,
+          "costMicroUsd": 600
+        },
+        {
+          "type": "finish",
+          "reason": "stop"
+        }
+      ]
+    }
+  ]
+}

@@ -12,6 +12,8 @@ import {
   toPurchaseSimulationRecord,
   toPreRegistrationRecord,
   toCaptureAttachmentRecord,
+  toPreferenceRecord,
+  toCategorizationRuleRecord,
 } from './backup.record.mapper.ts';
 
 /**
@@ -23,13 +25,14 @@ import {
  * `purchaseSimulation`. Categorias e contas vem antes de quem as referencia
  * (`categoryId`/`accountId`); a serie vem antes das ocorrencias que a apontam por `seriesId`;
  * o plano vem antes dos limites que o referenciam por `definitionId` (spec 016). Assim
- * importa num unico passe. Cada `listByUser` carrega a colecao daquele tipo em memoria, uma
+ * importa num unico passe. As preferencias (spec 032) so entram com `options.preferences`. Cada `listByUser` carrega a colecao daquele tipo em memoria, uma
  * de cada vez.
  */
 export async function* streamBackupRecords(
   database: Database,
   userId: string,
   exportedAt: Date,
+  options: { readonly preferences?: boolean; readonly rules?: boolean } = {},
 ): AsyncGenerator<BackupRecord> {
   yield {
     kind: 'header',
@@ -70,6 +73,19 @@ export async function* streamBackupRecords(
     yield toPreRegistrationRecord(pre);
     for (const attachment of await database.captureAttachments.listByPreRegistration(userId, pre.id)) {
       yield toCaptureAttachmentRecord(attachment);
+    }
+  }
+  // spec 032 (backup v4): preferencias do agente, depois de contas e categorias (o escopo as cita).
+  // So no backup completo - o snapshot de cenario nao carrega nem restaura preferencias.
+  if (options.preferences === true) {
+    for (const preference of await database.preferences.preferences.list(userId)) {
+      yield toPreferenceRecord(preference);
+    }
+  }
+  // spec 033 (backup v5): regras de categorizacao, depois das categorias que citam. So no backup completo.
+  if (options.rules === true) {
+    for (const rule of await database.plans.rules.list(userId)) {
+      yield toCategorizationRuleRecord(rule);
     }
   }
 }

@@ -1,0 +1,238 @@
+{
+  "model": "openai/gpt-oss-20b",
+  "total": 12,
+  "passed": 0,
+  "exactness": 0,
+  "inventedFigures": 0,
+  "improperWrites": 0,
+  "costMicroUsd": null,
+  "totalMs": 1328.3399810000003,
+  "byCategory": {
+    "composite": {
+      "total": 12,
+      "passed": 0
+    }
+  },
+  "failures": [
+    {
+      "id": "composite.resumo.2026-09",
+      "category": "composite",
+      "exact": false,
+      "invented": [],
+      "trajectoryOk": false,
+      "forbiddenHit": false,
+      "improperWrite": false,
+      "behaviorOk": true,
+      "passed": false,
+      "costMicroUsd": null,
+      "ms": 351.64727899999997,
+      "excerpt": "",
+      "reasons": [
+        "execução falhou (LLM_AUTH)",
+        "trajetória: esperado [get_month_summary], chamado []"
+      ]
+    },
+    {
+      "id": "composite.resumo.2026-08",
+      "category": "composite",
+      "exact": false,
+      "invented": [],
+      "trajectoryOk": false,
+      "forbiddenHit": false,
+      "improperWrite": false,
+      "behaviorOk": true,
+      "passed": false,
+      "costMicroUsd": null,
+      "ms": 53.50250299999993,
+      "excerpt": "",
+      "reasons": [
+        "execução falhou (LLM_AUTH)",
+        "trajetória: esperado [get_month_summary], chamado []"
+      ]
+    },
+    {
+      "id": "composite.resumo.2026-07",
+      "category": "composite",
+      "exact": false,
+      "invented": [],
+      "trajectoryOk": false,
+      "forbiddenHit": false,
+      "improperWrite": false,
+      "behaviorOk": true,
+      "passed": false,
+      "costMicroUsd": null,
+      "ms": 119.26344800000015,
+      "excerpt": "",
+      "reasons": [
+        "execução falhou (LLM_AUTH)",
+        "trajetória: esperado [get_month_summary], chamado []"
+      ]
+    },
+    {
+      "id": "composite.resumo.2026-10",
+      "category": "composite",
+      "exact": false,
+      "invented": [],
+      "trajectoryOk": false,
+      "forbiddenHit": false,
+      "improperWrite": false,
+      "behaviorOk": true,
+      "passed": false,
+      "costMicroUsd": null,
+      "ms": 70.11575700000003,
+      "excerpt": "",
+      "reasons": [
+        "execução falhou (LLM_AUTH)",
+        "trajetória: esperado [get_month_summary], chamado []"
+      ]
+    },
+    {
+      "id": "composite.duas.categorias.2026-09.mercado.lazer",
+      "category": "composite",
+      "exact": false,
+      "invented": [],
+      "trajectoryOk": false,
+      "forbiddenHit": false,
+      "improperWrite": false,
+      "behaviorOk": true,
+      "passed": false,
+      "costMicroUsd": null,
+      "ms": 115.99479600000018,
+      "excerpt": "",
+      "reasons": [
+        "execução falhou (LLM_AUTH)",
+        "trajetória: esperado [query_transactions], chamado []"
+      ]
+    },
+    {
+      "id": "composite.duas.categorias.2026-08.transporte.sade",
+      "category": "composite",
+      "exact": false,
+      "invented": [],
+      "trajectoryOk": false,
+      "forbiddenHit": false,
+      "improperWrite": false,
+      "behaviorOk": true,
+      "passed": false,
+      "costMicroUsd": null,
+      "ms": 116.5500790000001,
+      "excerpt": "",
+      "reasons": [
+        "execução falhou (LLM_AUTH)",
+        "trajetória: esperado [query_transactions], chamado []"
+      ]
+    },
+    {
+      "id": "composite.duas.categorias.2026-07.mercado.restaurantes",
+      "category": "composite",
+      "exact": false,
+      "invented": [],
+      "trajectoryOk": false,
+      "forbiddenHit": false,
+      "improperWrite": false,
+      "behaviorOk": true,
+      "passed": false,
+      "costMicroUsd": null,
+      "ms": 117.86261499999978,
+      "excerpt": "",
+      "reasons": [
+        "execução falhou (LLM_AUTH)",
+        "trajetória: esperado [query_transactions], chamado []"
+      ]
+    },
+    {
+      "id": "composite.saldo.e.limite",
+      "category": "composite",
+      "exact": false,
+      "invented": [],
+      "trajectoryOk": false,
+      "forbiddenHit": false,
+      "improperWrite": false,
+      "behaviorOk": true,
+      "passed": false,
+      "costMicroUsd": null,
+      "ms": 100.4001760000001,
+      "excerpt": "",
+      "reasons": [
+        "execução falhou (LLM_AUTH)",
+        "trajetória: esperado [get_account_balances, get_spending_limits], chamado []"
+      ]
+    },
+    {
+      "id": "composite.poupanca.e.carteira",
+      "category": "composite",
+      "exact": false,
+      "invented": [],
+      "trajectoryOk": false,
+      "forbiddenHit": false,
+      "improperWrite": false,
+      "behaviorOk": true,
+      "passed": false,
+      "costMicroUsd": null,
+      "ms": 54.82581900000014,
+      "excerpt": "",
+      "reasons": [
+        "execução falhou (LLM_AUTH)",
+        "trajetória: esperado [get_account_balances], chamado []"
+      ]
+    },
+    {
+      "id": "composite.gastos.e.ganhos.setembro",
+      "category": "composite",
+      "exact": false,
+      "invented": [],
+      "trajectoryOk": false,
+      "forbiddenHit": false,
+      "improperWrite": false,
+      "behaviorOk": true,
+      "passed": false,
+      "costMicroUsd": null,
+      "ms": 120.13475399999993,
+      "excerpt": "",
+      "reasons": [
+        "execução falhou (LLM_AUTH)",
+        "trajetória: esperado [query_transactions], chamado []"
+      ]
+    },
+    {
+      "id": "composite.restaurantes.lazer.outubro",
+      "category": "composite",
+      "exact": false,
+      "invented": [],
+      "trajectoryOk": false,
+      "forbiddenHit": false,
+      "improperWrite": false,
+      "behaviorOk": true,
+      "passed": false,
+      "costMicroUsd": null,
+      "ms": 57.36723299999994,
+      "excerpt": "",
+      "reasons": [
+        "execução falhou (LLM_AUTH)",
+        "trajetória: esperado [query_transactions, get_spending_limits], chamado []"
+      ]
+    },
+    {
+      "id": "composite.saldo.e.fatura",
+      "category": "composite",
+      "exact": false,
+      "invented": [],
+      "trajectoryOk": false,
+      "forbiddenHit": false,
+      "improperWrite": false,
+      "behaviorOk": true,
+      "passed": false,
+      "costMicroUsd": null,
+      "ms": 50.675522,
+      "excerpt": "",
+      "reasons": [
+        "execução falhou (LLM_AUTH)",
+        "trajetória: esperado [get_account_balances, get_credit_card_status], chamado []"
+      ]
+    }
+  ],
+  "violations": [
+    "exatidão 0.0% abaixo de 95%"
+  ],
+  "ok": false
+}

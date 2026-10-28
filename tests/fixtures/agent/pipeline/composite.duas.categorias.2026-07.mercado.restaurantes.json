@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "turns": [
+    {
+      "events": [
+        {
+          "type": "tool_call",
+          "id": "call-1",
+          "name": "query_transactions",
+          "args": {
+            "from": "2026-07-01",
+            "to": "2026-07-31",
+            "category": "Mercado"
+          }
+        },
+        {
+          "type": "tool_call",
+          "id": "call-2",
+          "name": "query_transactions",
+          "args": {
+            "from": "2026-07-01",
+            "to": "2026-07-31",
+            "category": "Restaurantes"
+          }
+        },
+        {
+          "type": "usage",
+          "inputTokens": 500,
+          "outputTokens": 30,
+          "costMicroUsd": 900
+        },
+        {
+          "type": "finish",
+          "reason": "tool_calls"
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "type": "text_delta",
+          "text": "Em 07/2026: Mercado R$ 1.636,74 e Restaurantes R$ 990,64."
+        },
+        {
+          "type": "usage",
+          "inputTokens": 300,
+          "outputTokens": 40,
+          "costMicroUsd": 600
+        },
+        {
+          "type": "finish",
+          "reason": "stop"
+        }
+      ]
+    }
+  ]
+}

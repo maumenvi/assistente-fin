@@ -123,6 +123,23 @@ export const SYNC_CODECS: Readonly<Record<SyncEntity, SyncEntityCodec>> = {
     save: (db, e) => db.preRegistrations.save(e),
     remove: (db, u, id) => db.preRegistrations.delete(u, id),
   }),
+  preference: codec({
+    toRecord: mapper.toPreferenceRecord,
+    fromRecord: mapper.fromPreferenceRecord,
+    version: (preference) => preference.updatedAt,
+    find: (db, u, id) => db.preferences.preferences.get(u, id),
+    list: (db, u) => db.preferences.preferences.list(u),
+    // uso e origem sao locais do aparelho: o record que chega nao os conhece, entao preserva os daqui
+    save: async (db, e) => {
+      const previous = await db.preferences.preferences.get(e.userId, e.id);
+      await db.preferences.preferences.save(
+        previous === null
+          ? e
+          : { ...e, lastUsedAt: previous.lastUsedAt, sourceConversationId: previous.sourceConversationId, sourceMessageId: previous.sourceMessageId, sourceMessageRemoved: previous.sourceMessageRemoved },
+      );
+    },
+    remove: (db, u, id) => db.preferences.preferences.delete(u, id),
+  }),
   captureAttachment: codec({
     toRecord: mapper.toCaptureAttachmentRecord,
     fromRecord: mapper.fromCaptureAttachmentRecord,
@@ -134,5 +151,14 @@ export const SYNC_CODECS: Readonly<Record<SyncEntity, SyncEntityCodec>> = {
     },
     save: (db, e) => db.captureAttachments.save(e),
     remove: (db, u, id) => db.captureAttachments.delete(u, id),
+  }),
+  categorizationRule: codec({
+    toRecord: mapper.toCategorizationRuleRecord,
+    fromRecord: mapper.fromCategorizationRuleRecord,
+    version: (rule) => rule.updatedAt,
+    find: (db, u, id) => db.plans.rules.get(u, id),
+    list: (db, u) => db.plans.rules.list(u),
+    save: (db, e) => db.plans.rules.save(e),
+    remove: (db, u, id) => db.plans.rules.delete(u, id),
   }),
 };

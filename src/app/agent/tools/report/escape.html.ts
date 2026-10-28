@@ -1,0 +1,4 @@
+/** Escapa texto para HTML (corpo e atributos): todo texto vindo de dados passa por aqui. */
+export function escapeHtml(text: string): string {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}

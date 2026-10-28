@@ -14,8 +14,8 @@ export interface SyncOutbox {
   mode(): Promise<SyncMode>;
   setMode(mode: SyncMode): Promise<void>;
 
-  /** As mais antigas primeiro. */
-  pending(limit: number): Promise<OutboxEntry[]>;
+  /** As mais antigas primeiro. `exclude` pula entidades que o hub ainda nao entende (spec 032). */
+  pending(limit: number, exclude?: readonly SyncEntity[]): Promise<OutboxEntry[]>;
   pendingCount(): Promise<number>;
   /** Ha alteracao local ainda nao confirmada deste registro? */
   hasPending(entity: SyncEntity, entityId: string): Promise<boolean>;

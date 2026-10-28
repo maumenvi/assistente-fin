@@ -1,0 +1,11 @@
+{
+  "suite": "write",
+  "total": 12,
+  "accepted": 12,
+  "acceptedRate": 1,
+  "wrongValues": 0,
+  "unapprovedWrites": 0,
+  "violations": [],
+  "failures": [],
+  "ok": true
+}
